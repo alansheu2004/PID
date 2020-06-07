@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>PIDeconstructed</title>
+    </head>
+
+    <body>
+        <article>
+            <h1>PIDeconstructed</h1>
+            <h2>Getting from Point A to Point B</h2>
+
+            <section>
+                <p>Many mechanical component or industrial system you see today uses PID Control or some variant of it, commonly used for controlling the speed, temperature, pressure, or really anything controllable and measurable. Well, what is PID?</p>
+
+                <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
+
+                <p id=equation>\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d}e'(t) \]</p>
+
+                <p>If you don't have any experience with calculus, this formula might seem a bit daunting at first, but hopefully it will be easier to digest by the end of this. First, before we get our hands wet with simulations, I'll have to bore you a bit with what a control system is and how it works.</p>
+            </section>
+
+            <section>
+                <h3>Control System Basics</h3>
+
+                <p>When a car wants to get to a certain speed or a furnace wants to get to the right temperature, you can't just tell it to go to a certain spot and stop. A system like this needs a feedback loop, where the controller is constantly adjusted according to how close it is to the target. PID serves to make this more efficient.</p>
+
+                <p>Any control system has two importat values: the <b>setpoint (SP)</b>, which is the target valueou want to get to, and the <b>proccess variable (PV)</b>, or the current value measured by a sensor that you want to get closer to the setpoint. The difference between the setpoint and process variable is the <b>error (e)</b>. Because all these values may be constatly changing with time, it's usually written as a function of time instead of as a variable.</p>
+
+                <p id=equation>\[ e(t) = SP(t) - PV(t) \]</p>
+
+                <p>For this article, we'll use the example of a car. This car will start 100 meters away from a parking spot and will try to get as close as possible. Forget everything you know about controlling cars, and pretend that there is a lever that can accelerate the car forward and backward at up to 1 m/s<sup>2</sup>. This is a pretty simplistic low-level example, but it should work roughly.</p>
+
+                <p>Before delving into actual PID, let's take a look at a more basic control system as a example: <b>bang-bang control</b>. When \(PV < SP\) (\(e(t) > 0\)), the controller input will be set to maximum forward, and when \(PV > SP\) (\(e(t) < 0\)), the controller input will be set to maximum reversed. This means that our controller only has two discreet states (An error of 0 would yield a 0 controller input but is practically unachievable).</p>
+
+                <p>Theorically, the car would hover around the setpoint, but having just two discreet states will just lead to crazy oscillation due to inertia.</p>
+
+                <p class="temp">Car simulation of bang bang control with interactive max speed</p>
+
+                <p>Instead of this clunky graphic, let's use a graph. The horizontal axis will show how much time has elapsed in seconds, vertical axis will show distance. The dashed line shows the target setpoint, and the blue line shows the proccess variable over time. An additional red line will show the error over time. The closer the error is to 0, the better.</p>
+
+                <p class="temp">Graphed simulation of bang bang control with interactive max speed</p>
+
+                <p>Often, we will want to use flow diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
+
+                <p class="temp">Bang bang control diagram</p>
+
+                <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
+            </section>
+
+            <section>
+                <h3>Part 1: P Controller</h3>
+
+                <p>Let's start with a P controller. The p stands for proportional. For a P control system, the input for the process will be <u>proportional</u> to the error. This means that if SP is way above PV, the acceleration will be very large
+            </section>
+        </article>
+    </body>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</html>
