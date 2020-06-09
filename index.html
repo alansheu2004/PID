@@ -3,6 +3,8 @@
 <html>
     <head>
         <title>PIDeconstructed</title>
+
+        <link type="text/css" rel="stylesheet" href="style.css" />
     </head>
 
     <body>
@@ -29,11 +31,11 @@
 
                 <p id=equation>\[ e(t) = SP(t) - PV(t) \]</p>
 
-                <p>For this article, we'll use the example of a car. This car will start 100 meters away from a parking spot and will try to get as close as possible. Forget everything you know about controlling cars, and pretend that there is a lever that can accelerate the car forward and backward at up to 1 m/s<sup>2</sup>. This is a pretty simplistic low-level example, but it should work roughly.</p>
+                <p>For this article, we'll use the example of a car. This car will start 100 meters away from a parking spot and will try to get as close as possible. Forget everything you know about controlling cars, and pretend that the controller can set the acceleration of the car instantaneously forward and backward up to 1 m/s<sup>2</sup>. This is a very simplistic low-level model, but it should work roughly.</p>
 
-                <p>Before delving into actual PID, let's take a look at a more basic control system as a example: <b>bang-bang control</b>. When \(PV < SP\) (\(e(t) > 0\)), the controller input will be set to maximum forward, and when \(PV > SP\) (\(e(t) < 0\)), the controller input will be set to maximum reversed. This means that our controller only has two discreet states (An error of 0 would yield a 0 controller input but is practically unachievable).</p>
+                <p>Before delving into actual PID, let's take a look at a more basic control system as a example: <b>bang-bang control</b>. When \(PV < SP\) (the error is positive), the controller output will be set to positive 1: maximum forward, and when \(PV > SP\) (the error is negative), the controller output will be set to -1: maximum reversed. This means that our controller only has two discreet states (An error of 0 would yield a 0 controller input but is practically unachievable).</p>
 
-                <p>Theorically, the car would hover around the setpoint, but having just two discreet states will just lead to crazy oscillation due to inertia.</p>
+                <p>Theorically, the car would hover around the setpoint, but having just two discreet states will just lead to crazy oscillation due to no prediction.</p>
 
                 <p class="temp">Car simulation of bang bang control with interactive max speed</p>
 
@@ -51,7 +53,17 @@
             <section>
                 <h3>Part 1: P Controller</h3>
 
-                <p>Let's start with a P controller. The p stands for proportional. For a P control system, the input for the process will be <u>proportional</u> to the error. This means that if SP is way above PV, the acceleration will be very large
+                <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if SP is way above PV, the controller will output a large positive value, giving a large acceleration; if SP is only slightly above PV, the controller will output a small position value, giving a small acceleration. The opposite for negative.</p>
+
+                <p>Let's put it in numerical terms. If we make the controller output equal to the error, this will achieve the desired results. However, we want to multiply the error by a constant to scale it down if we want to make it faster or slower. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
+
+                <p>Here is ther first part of our equation. As you can see, the controllers output (\(CO(t)\)) is directly proportional to the error.</p>
+
+                <p>\[ CO(t) = K_{p}e(t) \]</p>
+
+                <p>Try getting a feel for a P controller in this simulation. Adjust the proportional gain and see what happens:</p>
+
+                <p class="temp">Simulation with P adjustable</p>
             </section>
         </article>
     </body>
