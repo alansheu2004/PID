@@ -5,6 +5,8 @@
         <title>PIDeconstructed</title>
 
         <link type="text/css" rel="stylesheet" href="style.css" />
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
 
     <body>
@@ -17,31 +19,96 @@
 
                 <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
 
-                <p id=equation>\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d}e'(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d}e'(t) \]</p>
 
-                <p>If you don't have any experience with calculus, this formula might seem a bit daunting at first, but hopefully it will be easier to digest by the end of this. First, before we get our hands wet with simulations, I'll have to bore you a bit with what a control system is and how it works.</p>
+                <p>If you don't have any experience with calculus, this formula might seem a bit daunting at first, but hopefully it will be easier to digest by the end of this; all you'll need is some algebra. First, before we get our hands wet with simulations, I'll have to bore you a bit with what a control system is and how it works.</p>
             </section>
 
             <section>
                 <h3>Control System Basics</h3>
 
-                <p>When a car wants to get to a certain speed or a furnace wants to get to the right temperature, you can't just tell it to go to a certain spot and stop. A system like this needs a feedback loop, where the controller is constantly adjusted according to how close it is to the target. PID serves to make this more efficient.</p>
+                <p>When a car wants to get to a certain speed or a furnace wants to get to the right temperature, we need a feedback loop, where the controller is constantly adjusting based on the current value. PID is one type of control system that uses a feedback loop.</p>
 
-                <p>Any control system has two importat values: the <b>setpoint (SP)</b>, which is the target valueou want to get to, and the <b>proccess variable (PV)</b>, or the current value measured by a sensor that you want to get closer to the setpoint. The difference between the setpoint and process variable is the <b>error (e)</b>. Because all these values may be constatly changing with time, it's usually written as a function of time instead of as a variable.</p>
+                <p>Any control system has two important values: the <b>setpoint (SP)</b>, which is the target valueou want to get to, and the <b>proccess variable (PV)</b>, or the current value measured by a sensor that you want to get closer to the setpoint. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of ay control system is to reduce the error ideally to 0. Because all these values may be constatly changing with time, it's usually written as a function of time instead of as a variable.</p>
 
-                <p id=equation>\[ e(t) = SP(t) - PV(t) \]</p>
+                <p class="equation">\[ e(t) = SP(t) - PV(t) \]</p>
 
-                <p>For this article, we'll use the example of a car. This car will start 100 meters away from a parking spot and will try to get as close as possible. Forget everything you know about controlling cars, and pretend that the controller can set the acceleration of the car instantaneously forward and backward up to 1 m/s<sup>2</sup>. This is a very simplistic low-level model, but it should work roughly.</p>
+                <p>Before delving into actual PID, let's take a look at a more naive control system as a example: <b>bang-bang (BB) control</b>. In BB control, when \(PV < SP\) (the error is positive), the controller output (CO) will be set to positive 1: forward, and when \(PV > SP\) (the error is negative), the controller output will be set to -1: reverse. This means that our controller only has two discreet states (technically 3, but an error of zero is unrealistic).</p>
 
-                <p>Before delving into actual PID, let's take a look at a more basic control system as a example: <b>bang-bang control</b>. When \(PV < SP\) (the error is positive), the controller output will be set to positive 1: maximum forward, and when \(PV > SP\) (the error is negative), the controller output will be set to -1: maximum reversed. This means that our controller only has two discreet states (An error of 0 would yield a 0 controller input but is practically unachievable).</p>
+                <p class="equation">\[ CO(t) = \begin{cases} 
+                    -C, & e(t)<0 \\ 
+                    C, & e(t)>0 \\ 
+                    0, & e(t)=0
+                \end{cases} \, \, \, \, \text{where C is a constant} \]</p>
 
-                <p>Theorically, the car would hover around the setpoint, but having just two discreet states will just lead to crazy oscillation due to no prediction.</p>
+                <p>Let's take the example of a car, which will start 10 meters from a parking spot and will try to get as close as possible. Let's pretend that the controller can set the acceleration of the car instantaneously forward and backward up to 1 m/s<sup>2</sup>. This is a very simplistic model, but it should work for the purpose of this.</p>
 
-                <p class="temp">Car simulation of bang bang control with interactive max speed</p>
+                <p>Let's take a look at BB Control in action! Pay attention to the error, acceleration, and velocity, and play around with the sliders:</p>
 
-                <p>Instead of this clunky graphic, let's use a graph. The horizontal axis will show how much time has elapsed in seconds, vertical axis will show distance. The dashed line shows the target setpoint, and the blue line shows the proccess variable over time. An additional red line will show the error over time. The closer the error is to 0, the better.</p>
+                <figure id="BBCarSim1">
+                    <div class="graphPanel">
+                        <div class="carSim">
+                            <img class="car" src="images/car.png" />
+                            <div class="setpointLine"></div>
+                        </div>
+                        <div class="errorBracket"></div>
+                        <p class="halfSize">SP: 10.00m</p>
+                        <p class="halfSize">PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">100.00</span> m</p>
+                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
+                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                    </div>
 
-                <p class="temp">Graphed simulation of bang bang control with interactive max speed</p>
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>Max Speed (m/s):</label>
+                        <div class="inputGroup">
+                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="4" step="0.01" value="2">
+                            <label for="maxSpeed1">2.00</label>
+                        </div>
+                        <label>Acceleration (m/s<sup>2</sup>):</label>
+                        <div class="inputGroup">
+                            <input id="acc1" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
+                            <label for="acc1">1.00</label>
+                        </div>
+                        <button class="start" onclick="BBCarSim1.sim.start()">Start!</button>
+                    </div>
+                </figure>
+
+                <p>As you can see, it's not great. After all, it's not like you start braking right when you hit the crosswalk; a good control system needs some amount of prediction. Bang-bang control tends to osscilate indefinitely. You can decrease the max speed to minimize overshoot, but then it takes much longer.</p>
+
+                <p>Instead of this clunky animation, let's use a graph. The horizontal axis will show how much time has elapsed in seconds, vertical axis will show displacement. The blue dashed line shows the target setpoint, and the red line shows the proccess variable over time. An additional green line will show the error over time. The closer the error is to 0, the better.</p>
+
+                <figure id="BBCarSim2">
+                    <div class="graphPanel">
+                        <div class="carSim">
+                            <img class="car" src="images/car.png" />
+                            <div class="setpointLine"></div>
+                        </div>
+                        <div class="errorBracket"></div>
+                        <div class="graph"></div>
+                        <p class="halfSize">SP: 10.00m</p>
+                        <p class="halfSize">PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">100.00</span> m</p>
+                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
+                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>Max Speed (m/s):</label>
+                        <div class="inputGroup">
+                            <input id="maxSpeed2" class="maxSpeedInput" type="range" min="0" max="4" step="0.01" value="2">
+                            <label for="maxSpeed2">2.00</label>
+                        </div>
+                        <label>Acceleration (m/s<sup>2</sup>):</label>
+                        <div class="inputGroup">
+                            <input id="acc2" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
+                            <label for="acc2">1.00</label>
+                        </div>
+                        <button class="start" onclick="BBCarSim2.sim.start()">Start!</button>
+                    </div>
+                </figure>
 
                 <p>Often, we will want to use flow diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
 
@@ -67,6 +134,9 @@
             </section>
         </article>
     </body>
+
+    <script src="sliders.js"></script>
+    <script src="sim.js"></script>
 
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async

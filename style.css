@@ -1,6 +1,8 @@
 * {
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+    outline: none;
 }
 
 @font-face {
@@ -8,33 +10,160 @@
     src: url("montserrat/Montserrat-Regular.otf");
 }
 
+sup {
+    vertical-align: top;
+    position: relative;
+    top: -0.25em;
+}
+
 body {
     font-family: Montserrat;
 }
 
 article {
-    padding: 5% 20%;
+    padding: 5% 10%;
+}
+
+section {
+    text-align: center;
 }
 
 h1 {
     text-align: center;
-    font-size: 4vw;
+    font-size: 6vh;
 }
 
 h2 {
     text-align: center;
-    font-size: 2vw;
+    font-size: 3vh;
     margin-bottom: 2vw;
 }
 
 h3 {
-    font-size: 2vw;
+    text-align: left;
+    font-size: 3.5vh;
     margin-top: 3vw;
     margin-bottom: 1vw;
 }
 
 p {
-    font-size: 1.25vw;
+    font-size: 2.5vh;
     margin-bottom: 1.25vw;
     text-align: justify;
+}
+
+p.equation {
+    display: inline-block;
+    background-color: #eebbbb;
+    padding: 0 2vw;
+}
+
+figure {
+    background-color: #dddddd;
+    width: 90%;
+    margin: 3vh auto;
+    display: flex;
+    flex-direction: row;
+}
+
+div.graphPanel {
+    flex: 3 1 0;
+    padding: 2vw;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+div.carSim {
+    position: relative;
+    border-bottom: 2px solid black;
+}
+
+img.car {
+    display: block;
+    margin-left: 0;
+    width: 20%;
+    transform: scaleX(-1);
+}
+
+div.setpointLine {
+    display: inline;
+    position: absolute;
+    border-left: 2px dashed blue;
+    height: 100%;
+    top: 0;
+    left: 75%;
+}
+
+div.errorBracket {
+    display: block;
+    border: 1px solid black;
+    border-top: none;
+    margin-top: 1vh;
+    margin-bottom: 4vh;
+    height: 2vh;
+}
+
+div.graph {
+    margin-bottom: 4vh;
+}
+
+div.graphPanel p {
+    font-size: 2.5vh;
+    margin-bottom: 0vh;
+    text-align: center;
+}
+
+div.graphPanel p.halfSize {
+    width: 45%;
+    display: inline-block;
+}
+
+span.acc {
+    display: inline-block;
+    margin-bottom: 2vh;
+}
+
+div.optPanel {
+    background-color: #eebbbb;
+    flex: 2 1 0;
+    padding: 2vw;
+    text-align: center;
+}
+
+div.optPanel h4 {
+    font-size: 3vh;
+    text-align: center;
+    margin-bottom: 1vh;
+}
+
+div.optPanel label {
+    display: block;
+    font-size: 2vh;
+    text-align: left;
+    margin-bottom: 0.5vh;
+}
+
+div.inputGroup {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1vh;
+}
+
+div.inputGroup input[type="range"] {
+    flex: 1 1 0;
+}
+
+div.inputGroup label {
+    flex: 0 0 2.5em;
+    font-size: 2vh;
+    text-align: right;
+}
+
+div.optPanel button.start {
+    padding: 1vh 2vw;
+    font-size: 3vh;
+    background-color: #ee6666;
+    border: none;
+    margin: auto;
+    font-family: Montserrat;
 }
