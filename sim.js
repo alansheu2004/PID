@@ -8,7 +8,7 @@ function Sim(figureId, graph, getAcc, adjustVel) {
 
     this.time = 0;
     this.counter = 0;
-    this.interval = 25;
+    this.interval = 50;
 
     this.ppm; //pixels per meter
     this.mpp; //meters per pixel
@@ -66,13 +66,14 @@ function Sim(figureId, graph, getAcc, adjustVel) {
 
         if(this.graph) {
             this.data.addRow([this.time, 10, this.pv, error]);
-            if(this.counter % 10 == 0) {
+            if(this.counter % 20 == 0) {
                 this.graph.draw(this.data, options);
             }
 
-            this.errorBracket.style.marginLeft = Math.min(this.setPointLine.offsetLeft, this.posPx + this.car.offsetWidth) + "px";
-            this.errorBracket.style.width = Math.abs((this.setPointLine.offsetLeft - (this.posPx + this.car.offsetWidth))) + "px";
         }
+
+        this.errorBracket.style.marginLeft = Math.min(this.setPointLine.offsetLeft, this.posPx + this.car.offsetWidth) + "px";
+        this.errorBracket.style.width = Math.abs((this.setPointLine.offsetLeft - (this.posPx + this.car.offsetWidth))) + "px";
     }
 
     this.start = function() {

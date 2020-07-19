@@ -43,12 +43,12 @@ h3 {
     text-align: left;
     font-size: 3.5vh;
     margin-top: 3vw;
-    margin-bottom: 1vw;
+    margin-bottom: 2vw;
 }
 
 p {
     font-size: 2.5vh;
-    margin-bottom: 1.25vw;
+    margin-bottom: 2vw;
     text-align: justify;
 }
 
@@ -71,6 +71,9 @@ div.graphPanel {
     padding: 2vw;
     text-align: center;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 div.carSim {
@@ -128,6 +131,9 @@ div.optPanel {
     flex: 2 1 0;
     padding: 2vw;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 div.optPanel h4 {
@@ -164,6 +170,6 @@ div.optPanel button.start {
     font-size: 3vh;
     background-color: #ee6666;
     border: none;
-    margin: auto;
+    margin: 1vh auto;
     font-family: Montserrat;
 }
