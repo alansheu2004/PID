@@ -52,9 +52,10 @@
                             <div class="setpointLine"></div>
                         </div>
                         <div class="errorBracket"></div>
-                        <p class="halfSize">SP: 10.00m</p>
-                        <p class="halfSize">PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">100.00</span> m</p>
+                        <p>Time: <span class="time">0.00</span> s</p>
+                        <p>SP: 10.00m</p>
+                        <p>PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">10.00</span> m</p>
                         <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
                         <p>Velocity: <span class="vel">0.00</span> m/s</p>
                     </div>
@@ -71,7 +72,11 @@
                             <input id="acc1" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
                             <label for="acc1">1.00</label>
                         </div>
-                        <button class="start" onclick="BBCarSim1.sim.start()">Start!</button>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
                     </div>
                 </figure>
 
@@ -87,9 +92,10 @@
                         </div>
                         <div class="errorBracket"></div>
                         <div class="graph"></div>
-                        <p class="halfSize">SP: 10.00m</p>
-                        <p class="halfSize">PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">100.00</span> m</p>
+                        <p>Time: <span class="time">0.00</span> s</p>
+                        <p>SP: 10.00m</p>
+                        <p>PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">10.00</span> m</p>
                         <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
                         <p>Velocity: <span class="vel">0.00</span> m/s</p>
                     </div>
@@ -106,13 +112,17 @@
                             <input id="acc2" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
                             <label for="acc2">1.00</label>
                         </div>
-                        <button class="start" onclick="BBCarSim2.sim.start()">Start!</button>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
                     </div>
                 </figure>
 
                 <p>Often, we will want to use flow diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
 
-                <p class="temp">Bang bang control diagram</p>
+                <img class="flowchart" src="images/bbFlowchart.svg" />
 
                 <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
             </section>

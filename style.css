@@ -73,7 +73,7 @@ div.graphPanel {
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
 }
 
 div.carSim {
@@ -116,12 +116,7 @@ div.graphPanel p {
     text-align: center;
 }
 
-div.graphPanel p.halfSize {
-    width: 45%;
-    display: inline-block;
-}
-
-span.acc {
+span.pv, span.acc {
     display: inline-block;
     margin-bottom: 2vh;
 }
@@ -165,11 +160,30 @@ div.inputGroup label {
     text-align: right;
 }
 
-div.optPanel button.start {
-    padding: 1vh 2vw;
+button.optButton {
+    position: relative;
+    padding: 1vh 1vw;
     font-size: 3vh;
     background-color: #ee6666;
     border: none;
     margin: 1vh auto;
     font-family: Montserrat;
+    color: white;
+    vertical-align: middle;
+    display: none;
+}
+
+button.optButton img {
+    height: 2.5vh;
+    margin-right: 0.5vw;
+    filter: invert();
+}
+
+button.optButton.visible {
+    display: initial;
+}
+
+img.flowchart {
+    width: 100%;
+    padding: 3vw;
 }
