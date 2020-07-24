@@ -1,7 +1,7 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(createSims);
 
-function Sim(figureId, graph, getAcc, adjustVel) {
+function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
     this.figureId = figureId;
     this.figure = document.getElementById(figureId);
     this.graph = graph;
@@ -13,15 +13,21 @@ function Sim(figureId, graph, getAcc, adjustVel) {
     this.ppm; //pixels per meter
     this.mpp; //meters per pixel
 
+    this.sp = sp;
     this.posPx = 0;
     this.pv = 0;
     this.acc = 0;
     this.vel = 0;
     this.error = 0;
 
-    this.car = document.querySelector("#" + figureId + " .car");
-    this.setPointLine = document.querySelector("#" + figureId + " .setpointLine");
-    this.errorBracket = document.querySelector("#" + figureId + " .errorBracket");
+    if(car) {
+        this.car = document.querySelector("#" + figureId + " .car");
+        this.setPointLine = document.querySelector("#" + figureId + " .setpointLine");
+        this.errorBracket = document.querySelector("#" + figureId + " .errorBracket");
+    } else {
+        this.car = false;
+    }
+
     this.timeSpan = document.querySelector("#" + figureId + " .time");
     this.pvSpan = document.querySelector("#" + figureId + " .pv");
     this.errorSpan = document.querySelector("#" + figureId + " .error");
@@ -35,7 +41,7 @@ function Sim(figureId, graph, getAcc, adjustVel) {
     var thisSim = this;
 
     this.getError = function() {
-        return (this.setPointLine.offsetLeft - (this.posPx + this.car.offsetWidth)) * this.mpp;
+        return this.sp - this.pv;
     }
 
     this.update = function() {
@@ -61,18 +67,19 @@ function Sim(figureId, graph, getAcc, adjustVel) {
         this.accSpan.textContent = Number(this.acc).toFixed(2);
         this.velSpan.textContent = this.vel.toFixed(2);
 
-        this.car.style.marginLeft = this.posPx + "px";
+        if(this.car) {
+            this.car.style.marginLeft = this.posPx + "px";
+            this.errorBracket.style.marginLeft = Math.min(this.setPointLine.offsetLeft, this.posPx + this.car.offsetWidth) + "px";
+            this.errorBracket.style.width = Math.abs((this.setPointLine.offsetLeft - (this.posPx + this.car.offsetWidth))) + "px";
+        }
 
         if(this.graph) {
-            this.data.addRow([this.time, 10, this.pv, this.error]);
-            if(this.counter % 20 == 0) {
+            this.data.addRow([this.time, this.sp, this.pv, this.error]);
+            if(this.counter % 10 == 0) {
                 this.graph.draw(this.data, options);
             }
 
         }
-
-        this.errorBracket.style.marginLeft = Math.min(this.setPointLine.offsetLeft, this.posPx + this.car.offsetWidth) + "px";
-        this.errorBracket.style.width = Math.abs((this.setPointLine.offsetLeft - (this.posPx + this.car.offsetWidth))) + "px";
     }
 
     this.play = function() {
@@ -92,15 +99,17 @@ function Sim(figureId, graph, getAcc, adjustVel) {
     }
 
     this.reset = function() {
-        this.ppm = (this.setPointLine.offsetLeft - (this.car.offsetLeft + this.car.offsetWidth)) / 10;
-        this.mpp = 1/this.ppm;
+        if(this.car) {
+            this.ppm = (this.setPointLine.offsetLeft - (this.car.offsetLeft + this.car.offsetWidth)) / this.sp;
+            this.mpp = 1/this.ppm;
+        }
         this.vel = 0;
         this.posPx = 0;
         this.pv = 0;
         this.time = 0;
         this.counter = 0;
         this.acc = 0;
-        this.error = 10 - this.pv;
+        this.error = this.sp - this.pv;
 
         if(graph) {
             this.data = new google.visualization.DataTable();
@@ -108,7 +117,7 @@ function Sim(figureId, graph, getAcc, adjustVel) {
             this.data.addColumn('number', 'SP');
             this.data.addColumn('number', 'PV');
             this.data.addColumn('number', 'e');
-            this.data.addRow([this.time, 10, this.pv, 10-this.pv]);
+            this.data.addRow([this.time, this.sp, this.pv, this.sp-this.pv]);
 
             this.graph = new google.visualization.LineChart(document.querySelector("#" + figureId + " .graph"));
         }
@@ -136,6 +145,19 @@ function getAccBB(error, sim) {
     }
 }
 
+function getAccP(error, sim) {
+    var maxFricDec = document.querySelector("#" + sim.figureId + " .maxFricDecInput").value;
+    var acc = document.querySelector("#" + sim.figureId + " .pInput").value * error;
+    if(sim.vel > maxFricDec) {
+        return acc - maxFricDec;
+    } else if(sim.vel < -maxFricDec) {
+        console.log(acc + maxFricDec);
+        return acc + maxFricDec;
+    } else {
+        return acc;
+    }
+}
+
 function limitVel(error, sim) {
     if(sim.vel > document.querySelector("#" + sim.figureId + " .maxSpeedInput").value) {
         sim.vel = Number(document.querySelector("#" + sim.figureId + " .maxSpeedInput").value);
@@ -145,8 +167,9 @@ function limitVel(error, sim) {
 }
 
 function createSims() {
-    BBCarSim1.sim = new Sim("BBCarSim1", false, getAccBB, limitVel);
-    BBCarSim2.sim = new Sim("BBCarSim2", true, getAccBB, limitVel);
+    BBCarSim1.sim = new Sim("BBCarSim1", true, false, 100, getAccBB, limitVel);
+    BBCarSim2.sim = new Sim("BBCarSim2", true, true, 100, getAccBB, limitVel);
+    PSim3.sim = new Sim("PSim3", false, true, 100, getAccP, limitVel);
 }
 
 const options = {

@@ -155,7 +155,7 @@ div.inputGroup input[type="range"] {
 }
 
 div.inputGroup label {
-    flex: 0 0 2.5em;
+    flex: 0 0 3em;
     font-size: 2vh;
     text-align: right;
 }

@@ -64,13 +64,13 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="4" step="0.01" value="2">
-                            <label for="maxSpeed1">2.00</label>
+                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
+                            <label for="maxSpeed1">15.00</label>
                         </div>
                         <label>Acceleration (m/s<sup>2</sup>):</label>
                         <div class="inputGroup">
-                            <input id="acc1" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
-                            <label for="acc1">1.00</label>
+                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
+                            <label for="acc1">10.00</label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -104,13 +104,13 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed2" class="maxSpeedInput" type="range" min="0" max="4" step="0.01" value="2">
-                            <label for="maxSpeed2">2.00</label>
+                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
+                            <label for="maxSpeed1">15.00</label>
                         </div>
                         <label>Acceleration (m/s<sup>2</sup>):</label>
                         <div class="inputGroup">
-                            <input id="acc2" class="accInput" type="range" min="0" max="2" step="0.01" value="1">
-                            <label for="acc2">1.00</label>
+                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
+                            <label for="acc1">10.00</label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -120,9 +120,9 @@
                     </div>
                 </figure>
 
-                <p>Often, we will want to use flow diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
+                <p>Often, we will want to use control block diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
 
-                <img class="flowchart" src="images/bbFlowchart.svg" />
+                <img class="flowchart" src="images/bbDiagram.svg" />
 
                 <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
             </section>
@@ -130,17 +130,51 @@
             <section>
                 <h3>Part 1: P Controller</h3>
 
-                <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if SP is way above PV, the controller will output a large positive value, giving a large acceleration; if SP is only slightly above PV, the controller will output a small position value, giving a small acceleration. The opposite for negative.</p>
+                <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output.</p>
 
-                <p>Let's put it in numerical terms. If we make the controller output equal to the error, this will achieve the desired results. However, we want to multiply the error by a constant to scale it down if we want to make it faster or slower. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
+                <p>Let's put it in numerical terms. If we make the controller output equal to the error, this will achieve the desired results. However, we want to multiply the error by a constant to scale it if we want to make it faster or slower. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
 
                 <p>Here is ther first part of our equation. As you can see, the controllers output (\(CO(t)\)) is directly proportional to the error.</p>
 
-                <p>\[ CO(t) = K_{p}e(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) \]</p>
 
                 <p>Try getting a feel for a P controller in this simulation. Adjust the proportional gain and see what happens:</p>
 
-                <p class="temp">Simulation with P adjustable</p>
+                <figure id="PSim3">
+                    <div class="graphPanel">
+                        <div class="graph"></div>
+                        <p>Time: <span class="time">0.00</span> s</p>
+                        <p>SP: 10.00m</p>
+                        <p>PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">10.00</span> m</p>
+                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
+                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>Max Speed (m/s):</label>
+                        <div class="inputGroup">
+                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
+                            <label for="maxSpeed3">15.00</label>
+                        </div>
+                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
+                        <div class="inputGroup">
+                            <input id="maxFricDec3" class="maxFricDecInput" type="range" min="0" max="10" step="0.01" value="4">
+                            <label for="maxFricDec3">4.00</label>
+                        </div>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p3" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.1">
+                            <label for="p3">0.10</label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
             </section>
         </article>
     </body>
