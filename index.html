@@ -122,13 +122,13 @@
 
                 <p>Often, we will want to use control block diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
 
-                <img class="flowchart" src="images/bbDiagram.svg" />
+                <img class="diagram" src="images/bbDiagram.svg" />
 
                 <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
             </section>
 
             <section>
-                <h3>Part 1: P Controller</h3>
+                <h3>P Controller: Getting There</h3>
 
                 <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output.</p>
 
@@ -182,7 +182,67 @@
 
                 <p>Not all hope is lost though as our next section on PI Controllers has the solution!</p>
 
-                <p>First let's take a look at our trusty control block diagram. YOu should see that our controller just takes the error and multiplies it by the proportionality constant.</p>
+                <p>First let's take a look at our trusty control block diagram. You should see that our controller just takes the error and multiplies it by the proportionality constant.</p>
+
+                <img class="diagram" src="images/pDiagram.svg" />
+
+                <p>Now onto the next step!</p>          
+            </section>
+
+            <section>
+                <h3>PI Controller: A Little Push</h3>
+
+                <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea if you don't know calculus, but I'll try to give a basic idea for what it is in a sort of mini calculus crash course. If you're interested, you should learn more about integrals, as this is just a short and sloppy run-down.</p>
+                
+                <p>Put simply, the integral is the area under a curve over a certain interval. Integrals are often notated with a weird S-shape:</p>
+
+                <p class="equation">\[ \int f(x) \, dx \]</p>
+
+                <p>This may seem weird, but it's quite simple. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. That's all it really means. The little \(dx\) just represents that our integral is in terms of our intependent variable x, but that can be ignored.</p>
+
+                <p>Integral image</p>
+
+                <p>If the curve goes under the x-axis, then the integral will be negative under that portion of the graph.</p>
+
+                <p>Negative Integral image</p>
+
+                <p>Now this might seem like something too complicated to work out, but we can approximate the integral using something called a Riemann sum. If we filled the area with rectangles, we could find the approximate area of all the rectangles. If we half the width, that would double the amount of rectangles, but also roughly half the area. The area of each rectangle is the width multiplied by the output of the function at that x-value.</p>
+
+                <p>Riemann Sum image</p>
+
+                <p>Note that as we decrease the width, the approximation gets closer and closer to the real integral. This gives us a way to approximate the integral relatively efficiently.</p>
+
+                <p>We are now ready for PI COntrol.</p>
+
+                <p>We want to find the integral of the error function. Given how the error is a recursive function, constantly adjusting to itself in real time, we can't really find the integral analytically.</p>
+
+                <p>This is where Riemann sums come in. No control system can reasonably iterate at every single moment; there always has to be some sort of frame rate or small tick of time where the control system waits in between iterations. We can take advantage of this to approximate an integral.</p>
+
+                <p>Riemann pi image</p>
+
+                <p>We'll leave those computations out for now until the last chapter and pretend that we can just find the area under the curve.</p>
+
+                <p>For our updated PI control system, here is the equation:</p>
+
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int e(t) \, dt \]</p>
+
+                <p>As you can see, we've taken the P term from our P Controller and just added an integral to the end. We also have a similar \(K_{i}\), which we multiply with the integral in order to give it more or less weight. This is called the <b>i-gain</b></p>
+
+                <p>Now you might be thinking, how is the integral supposed to make it better? Before I answer, try fiddling around with it in a simulation. What does the integral do? What happens if you give it more or less weight?</p>
+
+                <p>PI Sim</p>
+
+                <p>Have an idea of what the I term does? Over time, it sums up all the errors over time. When the error is still very large, it will add a lot to the controller output, accelerating it. When the error gets closer to 0, it will still increase the integral, but just a lot less. When the error gets less than 0, the integral will begin decreasing. See in the simulation how the integral changes as the error changes.</p>
+
+                <p>Can you see how this could get rid of our pesky steady-state error? With PI Control, the steady state error will continue to increase the area under the curve even if the error stays the same. As a result, it will gruadually drive the acceleration to overcome the friction. In a sense, the integral term is way to keep pushing the controller to adjust its value.</p>
+
+                <p>It's a big balancing act, however. An i-gain too small could lead to the error being reduced too slowly, with a steady state error basically coming back. On the other hand, if the i-gain is too big, it could cause the PV to overshoot the SP and overshoot again when trying to adjust back, causing the system to oscillate back and forth out of control. It's crucial that you understand how the i-term works in order to find that sweet spot.</p>
+
+                <p>We can add another element to our control block diagram, which adds the i-term to our previous p-term.</p>
+
+                <p>PI control block diagram</p>
+
+                <p>PI Controllers are very powerful, and in some cases enough. There are many systems that use a PI controller. But, if you want even greater precision and efficiency, look no further that the full PID Controller!</p>
             </section>
         </article>
     </body>

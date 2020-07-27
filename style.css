@@ -183,7 +183,6 @@ button.optButton.visible {
     display: initial;
 }
 
-img.flowchart {
+img.diagram {
     width: 80%;
-    padding: 3vw;
 }
