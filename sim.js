@@ -49,10 +49,12 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.counter++;
         this.error = this.getError();
         
-        this.acc = getAcc(this.error, this);
+        this.acc = getAcc(this);
 
         this.vel += this.acc * this.interval/1000;
-        adjustVel(this.error, this);
+        for(let func of adjustVel) {
+            func(this);
+        }
 
         this.pv += this.vel * this.interval/1000;
         this.posPx = this.pv * this.ppm;
@@ -135,30 +137,21 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
     this.reset();
 }
 
-function getAccBB(error, sim) {
-    if(error > 0) {
+function getAccBB(sim) {
+    if(sim.error > 0) {
         return document.querySelector("#" + sim.figureId + " .accInput").value;
-    } else if(error < 0) {
+    } else if(sim.error < 0) {
         return -document.querySelector("#" + sim.figureId + " .accInput").value;
     } else {
         return 0;
     }
 }
 
-function getAccP(error, sim) {
-    var maxFricDec = document.querySelector("#" + sim.figureId + " .maxFricDecInput").value;
-    var acc = document.querySelector("#" + sim.figureId + " .pInput").value * error;
-    if(sim.vel > maxFricDec) {
-        return acc - maxFricDec;
-    } else if(sim.vel < -maxFricDec) {
-        console.log(acc + maxFricDec);
-        return acc + maxFricDec;
-    } else {
-        return acc;
-    }
+function getAccP(sim) {
+    return document.querySelector("#" + sim.figureId + " .pInput").value * sim.error;
 }
 
-function limitVel(error, sim) {
+function limitVel(sim) {
     if(sim.vel > document.querySelector("#" + sim.figureId + " .maxSpeedInput").value) {
         sim.vel = Number(document.querySelector("#" + sim.figureId + " .maxSpeedInput").value);
     } else if(sim.vel < -document.querySelector("#" + sim.figureId + " .maxSpeedInput").value) {
@@ -166,10 +159,19 @@ function limitVel(error, sim) {
     }
 }
 
+function applyFriction(sim) {
+    var friction = document.querySelector("#" + sim.figureId + " .maxFricDecInput").value * sim.interval/1000;
+    if(sim.vel > 0) {
+        sim.vel = Math.max(0, sim.vel - friction);
+    } else if(sim.vel < 0) {
+        sim.vel = Math.min(0, sim.vel + friction);
+    }
+}
+
 function createSims() {
-    BBCarSim1.sim = new Sim("BBCarSim1", true, false, 100, getAccBB, limitVel);
-    BBCarSim2.sim = new Sim("BBCarSim2", true, true, 100, getAccBB, limitVel);
-    PSim3.sim = new Sim("PSim3", false, true, 100, getAccP, limitVel);
+    BBCarSim1.sim = new Sim("BBCarSim1", true, false, 100, getAccBB, [limitVel]);
+    BBCarSim2.sim = new Sim("BBCarSim2", true, true, 100, getAccBB, [limitVel]);
+    PSim3.sim = new Sim("PSim3", false, true, 100, getAccP, [limitVel, applyFriction]);
 }
 
 const options = {

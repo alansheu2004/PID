@@ -138,7 +138,7 @@
 
                 <p class="equation">\[ CO(t) = K_{p}e(t) \]</p>
 
-                <p>Try getting a feel for a P controller in this simulation. Adjust the proportional gain and see what happens:</p>
+                <p>Try getting a feel for a P controller in this simulation, where we've added a bit of friction to have it represent reality just a bit more accurately. Notice how instead of having the acceleration be constant, it changes based on how close the error is to 0.</p>
 
                 <figure id="PSim3">
                     <div class="graphPanel">
@@ -175,6 +175,14 @@
                         </div>
                     </div>
                 </figure>
+
+                <p>Yay, our control system, is no longer oscillating constantly, and it's a definite improvement over Bang-bang control. However, we now have another issue: the persistent error at the end. Towards the end of the graph, you can see that the error gets close to 0 but is stuck at some value. This is called the <b>steady-state error</b>. You can hover over the line on the graph to see its precise value.</p>
+
+                <p>But what causes steady-state error? Well, since our error is very close to 0, the controller will output a small value. In a perfect world, this would be no problem, but we have friction in our world. The output from the controller is just not enough to overcome friction and drive the error to 0. While this is definitely exxagerated in our simulation, this can be a problem in the real world where a degree of precision is needed.</p>
+
+                <p>Not all hope is lost though as our next section on PI Controllers has the solution!</p>
+
+                <p>First let's take a look at our trusty control block diagram. YOu should see that our controller just takes the error and multiplies it by the proportionality constant.</p>
             </section>
         </article>
     </body>
