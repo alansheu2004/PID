@@ -2,6 +2,8 @@ google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(createSims);
 
 function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
+    sims.push(this);
+
     this.figureId = figureId;
     this.figure = document.getElementById(figureId);
     this.graph = graph;
@@ -101,6 +103,8 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.playButton.classList.remove("visible");
         this.pauseButton.classList.add("visible");
         this.resetButton.classList.remove("visible");
+
+        runningSims.push(this);
     }
 
     this.pause = function() {
@@ -109,9 +113,14 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.playButton.classList.add("visible");
         this.pauseButton.classList.remove("visible");
         this.resetButton.classList.add("visible");
+
+        let index = runningSims.indexOf(this);
+        if (index > -1) { runningSims.splice(index, 1); }
     }
 
     this.reset = function() {
+        clearInterval(this.loop);
+
         if(this.car) {
             this.ppm = (this.setPointLine.offsetLeft - (this.car.offsetLeft + this.car.offsetWidth)) / this.sp;
             this.mpp = 1/this.ppm;
@@ -142,6 +151,9 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.resetButton.classList.remove("visible");
 
         this.draw();
+
+        let index = runningSims.indexOf(this);
+        if (index > -1) { runningSims.splice(index, 1); }
     }
 
     this.playButton.addEventListener("click", function() {thisSim.play();});
@@ -191,6 +203,27 @@ function createSims() {
     PSim3.sim = new Sim("PSim3", false, true, 100, getAccP, [limitVel, applyFriction]);
     PISim4.sim = new Sim("PISim4", false, true, 100, getAccPI, [limitVel, applyFriction]);
 }
+
+var sims = [];
+window.addEventListener("resize", function() {
+    for(let sim of sims) {
+        sim.draw();
+    }
+});
+
+var runningSims = [];
+window.addEventListener("scroll", function() {
+    let simsToPause = [];
+    for(let sim of runningSims) {
+        let box = sim.figure.getBoundingClientRect();
+        if(box.top > window.innerHeight || box.bottom < 0) {
+            simsToPause.push(sim);
+        }
+    }
+    for(let sim of simsToPause) {
+        sim.pause();
+    }
+});
 
 const options = {
     'width': '100%',
