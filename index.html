@@ -10,11 +10,11 @@
     </head>
 
     <body>
+        <h1>PIDeconstructed</h1>
+        <h2>Getting from Point A to Point B</h2>
+
         <article>
             <section>
-                <h1>PIDeconstructed</h1>
-                <h2>Getting from Point A to Point B</h2>
-
                 <p>Many mechanical component or industrial system you see today uses PID Control or some variant of it, commonly used for controlling the speed, temperature, pressure, or really anything controllable and measurable. Well, what is PID?</p>
 
                 <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
@@ -203,17 +203,19 @@
 
                 <p>This may seem weird, but it's quite simple. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. The little \(dx\) just represents that our integral is in terms of our intependent variable x, but that can be ignored.</p>
 
-                <p>Integral image</p>
+                <img src="images/integral.png" alt="Integral" />
 
                 <p>If the curve goes under the x-axis, then the integral will be negative under that portion of the graph.</p>
 
-                <p>Negative Integral image</p>
+                <img src="images/negIntegral.png" alt="Negative Integral" />
 
-                <p>Now this might seem like something too complicated to work out, but we can approximate the integral using something called a Riemann sum. If we filled the area with rectangles, we could find the approximate area of all the rectangles. If we half the width, that would double the amount of rectangles, but also roughly half the area. The area of each rectangle is the width multiplied by the output of the function at that x-value.</p>
+                <p>Now this might seem like something too complicated to work out, but we can approximate the integral using something called a Riemann sum. If we filled the area with rectangles, we can find the approximate area of all the rectangles. As we increase the amount of rectangles, our approximation gets better and better.</p>
 
-                <p>Riemann Sum image</p>
+                <img src="images/riemann1.png" alt="Riemann Sum Thick" />
+                <img src="images/riemann2.png" alt="Riemann Sum Medium" />
+                <img src="images/riemann3.png" alt="Riemann Sum Thin" />
 
-                <p>Note that as we decrease the width, the approximation gets closer and closer to the real integral. This gives us a way to approximate the integral relatively efficiently.</p>
+                <p>If you're still unsure about integrals and Riemann Sums, here's a little embed from Desmos that you can play around with.</p>
 
                 <p>We are now ready for PI COntrol.</p>
 

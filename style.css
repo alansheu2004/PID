@@ -21,29 +21,72 @@ body {
 }
 
 article {
-    padding: 5% 10%;
+    padding: 2% 10%;
 }
 
 section {
     text-align: center;
+    margin-bottom: 8vh;
+}
+
+:root, section:nth-child(1) {
+    --background: #fc8b8b;
+    --dark-background: #ff5757;
+}
+
+section:nth-child(2) {
+    --background: #fcc28b;
+    --dark-background: #ffab57;
+}
+
+section:nth-child(3) {
+    --background: #fafc8b;
+    --dark-background: #fcff57;
+}
+
+section:nth-child(4) {
+    --background: #98fc8b;
+    --dark-background: #6bff57;
+}
+
+section:nth-child(5) {
+    --background: #8bfcf4;
+    --dark-background: #57fff7;
+}
+
+section:nth-child(6) {
+    --background: #918bfc;
+    --dark-background: #5f57ff;
+}
+
+section:nth-child(7) {
+    --background: #d18bfc;
+    --dark-background: #bf57ff;
 }
 
 h1 {
     text-align: center;
-    font-size: 6vh;
+    font-size: 8vh;
+    background-color: var(--dark-background);
+    padding: 10vh 0 2vh;
 }
 
 h2 {
     text-align: center;
     font-size: 3vh;
     margin-bottom: 2vw;
+    background-color: var(--background);
+    padding: 2vh 0;
 }
 
 h3 {
+    display: block;
     text-align: left;
     font-size: 3.5vh;
     margin-top: 3vw;
     margin-bottom: 2vw;
+    background-color: var(--dark-background);
+    padding: 3vh 5vw 1vh 2vw;
 }
 
 p {
@@ -54,7 +97,7 @@ p {
 
 p.equation {
     display: inline-block;
-    background-color: #eebbbb;
+    background-color: var(--background);
     padding: 0 2vw;
 }
 
@@ -122,7 +165,7 @@ span.acc {
 }
 
 div.optPanel {
-    background-color: #eebbbb;
+    background-color: var(--background);
     flex: 2 1 0;
     padding: 2vw;
     text-align: center;
@@ -170,7 +213,7 @@ button.optButton {
     position: relative;
     padding: 1vh 1vw;
     font-size: 3vh;
-    background-color: #ee6666;
+    background-color: var(--dark-background);
     border: none;
     margin: 1vh auto;
     font-family: Montserrat;
@@ -187,6 +230,11 @@ button.optButton img {
 
 button.optButton.visible {
     display: initial;
+}
+
+section > img {
+    width: 30%;
+    margin-bottom: 2vw;
 }
 
 img.diagram {
