@@ -11,10 +11,10 @@
 
     <body>
         <article>
-            <h1>PIDeconstructed</h1>
-            <h2>Getting from Point A to Point B</h2>
-
             <section>
+                <h1>PIDeconstructed</h1>
+                <h2>Getting from Point A to Point B</h2>
+
                 <p>Many mechanical component or industrial system you see today uses PID Control or some variant of it, commonly used for controlling the speed, temperature, pressure, or really anything controllable and measurable. Well, what is PID?</p>
 
                 <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
@@ -64,9 +64,10 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
-                            <label for="maxSpeed1">15.00</label>
+                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
+                            <label for="maxSpeed1">20.00</label>
                         </div>
+                        <hr />
                         <label>Acceleration (m/s<sup>2</sup>):</label>
                         <div class="inputGroup">
                             <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
@@ -104,9 +105,10 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
-                            <label for="maxSpeed1">15.00</label>
+                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
+                            <label for="maxSpeed1">20.00</label>
                         </div>
+                        <hr />
                         <label>Acceleration (m/s<sup>2</sup>):</label>
                         <div class="inputGroup">
                             <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
@@ -155,17 +157,18 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="15">
-                            <label for="maxSpeed3">15.00</label>
+                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
+                            <label for="maxSpeed3">20.00</label>
                         </div>
                         <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
                         <div class="inputGroup">
-                            <input id="maxFricDec3" class="maxFricDecInput" type="range" min="0" max="10" step="0.01" value="4">
-                            <label for="maxFricDec3">4.00</label>
+                            <input id="maxFricDec3" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
+                            <label for="maxFricDec3">2.50</label>
                         </div>
+                        <hr />
                         <label>P-Gain (K<sub>p</sub>):</label>
                         <div class="inputGroup">
-                            <input id="p3" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.1">
+                            <input id="p3" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.10">
                             <label for="p3">0.10</label>
                         </div>
                         <div>
@@ -194,11 +197,11 @@
 
                 <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea if you don't know calculus, but I'll try to give a basic idea for what it is in a sort of mini calculus crash course. If you're interested, you should learn more about integrals, as this is just a short and sloppy run-down.</p>
                 
-                <p>Put simply, the integral is the area under a curve over a certain interval. Integrals are often notated with a weird S-shape:</p>
+                <p>Put simply, the integral is the area under the graph of a function. Integrals are often notated with a weird S-shape:</p>
 
                 <p class="equation">\[ \int f(x) \, dx \]</p>
 
-                <p>This may seem weird, but it's quite simple. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. That's all it really means. The little \(dx\) just represents that our integral is in terms of our intependent variable x, but that can be ignored.</p>
+                <p>This may seem weird, but it's quite simple. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. The little \(dx\) just represents that our integral is in terms of our intependent variable x, but that can be ignored.</p>
 
                 <p>Integral image</p>
 
@@ -230,7 +233,48 @@
 
                 <p>Now you might be thinking, how is the integral supposed to make it better? Before I answer, try fiddling around with it in a simulation. What does the integral do? What happens if you give it more or less weight?</p>
 
-                <p>PI Sim</p>
+                <figure id="PISim4">
+                    <div class="graphPanel">
+                        <div class="graph"></div>
+                        <p>Time: <span class="time">0.00</span> s</p>
+                        <p>SP: 10.00m</p>
+                        <p>PV: <span class="pv">0.00</span> m</p>
+                        <p>Error: <span class="error">10.00</span> m</p>
+                        <p>Integral: <span class="int">0.00</span></p>
+                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
+                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>Max Speed (m/s):</label>
+                        <div class="inputGroup">
+                            <input id="maxSpeed4" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
+                            <label for="maxSpeed4">20.00</label>
+                        </div>
+                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
+                        <div class="inputGroup">
+                            <input id="maxFricDec4" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
+                            <label for="maxFricDec4">2.50</label>
+                        </div>
+                        <hr />
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p4" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.2">
+                            <label for="p4">0.20</label>
+                        </div>
+                        <label>I-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="i4" class="iInput" type="range" min="0" max="0.05" step="0.005" value="0.01">
+                            <label for="i4">0.01</label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
 
                 <p>Have an idea of what the I term does? Over time, it sums up all the errors over time. When the error is still very large, it will add a lot to the controller output, accelerating it. When the error gets closer to 0, it will still increase the integral, but just a lot less. When the error gets less than 0, the integral will begin decreasing. See in the simulation how the integral changes as the error changes.</p>
 

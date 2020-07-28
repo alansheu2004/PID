@@ -116,9 +116,9 @@ div.graphPanel p {
     text-align: center;
 }
 
-span.pv, span.acc {
+span.acc {
     display: inline-block;
-    margin-bottom: 2vh;
+    margin-top: 2vh;
 }
 
 div.optPanel {
@@ -158,6 +158,12 @@ div.inputGroup label {
     flex: 0 0 3em;
     font-size: 2vh;
     text-align: right;
+}
+
+div.optPanel hr {
+    border: none;
+    border-top: 1px solid black;
+    margin: 2vh 0;
 }
 
 button.optButton {

@@ -19,6 +19,9 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
     this.acc = 0;
     this.vel = 0;
     this.error = 0;
+    this.lastError = null;
+
+    this.integral = 0;
 
     if(car) {
         this.car = document.querySelector("#" + figureId + " .car");
@@ -31,6 +34,7 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
     this.timeSpan = document.querySelector("#" + figureId + " .time");
     this.pvSpan = document.querySelector("#" + figureId + " .pv");
     this.errorSpan = document.querySelector("#" + figureId + " .error");
+    this.intSpan = document.querySelector("#" + figureId + " .int");
     this.accSpan = document.querySelector("#" + figureId + " .acc");
     this.velSpan = document.querySelector("#" + figureId + " .vel");
 
@@ -48,6 +52,10 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.time += this.interval/1000;
         this.counter++;
         this.error = this.getError();
+
+        if(this.lastError != null) {
+            this.integral += this.interval/1000 * (this.error + this.lastError)/2;
+        }
         
         this.acc = getAcc(this);
 
@@ -59,7 +67,9 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.pv += this.vel * this.interval/1000;
         this.posPx = this.pv * this.ppm;
 
-        this.draw()
+        this.lastError = this.error;
+
+        this.draw();
     }
 
     this.draw = function() {
@@ -67,6 +77,7 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.pvSpan.textContent = this.pv.toFixed(2);
         this.errorSpan.textContent = this.error.toFixed(2);
         this.accSpan.textContent = Number(this.acc).toFixed(2);
+        if(this.intSpan != null) {this.intSpan.textContent = this.integral.toFixed(2);}
         this.velSpan.textContent = this.vel.toFixed(2);
 
         if(this.car) {
@@ -112,6 +123,8 @@ function Sim(figureId, car, graph, sp, getAcc, adjustVel) {
         this.counter = 0;
         this.acc = 0;
         this.error = this.sp - this.pv;
+        this.lastError = null;
+        this.integral = 0;
 
         if(graph) {
             this.data = new google.visualization.DataTable();
@@ -151,6 +164,10 @@ function getAccP(sim) {
     return document.querySelector("#" + sim.figureId + " .pInput").value * sim.error;
 }
 
+function getAccPI(sim) {
+    return getAccP(sim) + document.querySelector("#" + sim.figureId + " .iInput").value * sim.integral;
+}
+
 function limitVel(sim) {
     if(sim.vel > document.querySelector("#" + sim.figureId + " .maxSpeedInput").value) {
         sim.vel = Number(document.querySelector("#" + sim.figureId + " .maxSpeedInput").value);
@@ -172,6 +189,7 @@ function createSims() {
     BBCarSim1.sim = new Sim("BBCarSim1", true, false, 100, getAccBB, [limitVel]);
     BBCarSim2.sim = new Sim("BBCarSim2", true, true, 100, getAccBB, [limitVel]);
     PSim3.sim = new Sim("PSim3", false, true, 100, getAccP, [limitVel, applyFriction]);
+    PISim4.sim = new Sim("PISim4", false, true, 100, getAccPI, [limitVel, applyFriction]);
 }
 
 const options = {
