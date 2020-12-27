@@ -5,73 +5,67 @@
         <title>PIDeconstructed</title>
 
         <link type="text/css" rel="stylesheet" href="style.css" />
-
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <link type="text/css" rel="stylesheet" href="figure.css" />
     </head>
 
     <body>
-        <h1>PIDeconstructed</h1>
+        <h1>
+            <img id="titleImage" src="images/pidIcon.svg" />
+            <br />
+            PIDeconstructed
+        </h1>
         <h2>Getting from Point A to Point B</h2>
 
         <article>
             <section>
-                <p>Many mechanical component or industrial system you see today uses PID Control or some variant of it, commonly used for controlling the speed, temperature, pressure, or really anything controllable and measurable. Well, what is PID?</p>
+                <p>Whether you know it or not, PID is found in the machines and processes all around you. In the motors of an electric fan or the temperature settings of an oven, chances are there is some form of PID at work. So what is PID?</p>
 
-                <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
+                <p>Formally, PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
 
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d}e'(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d} \frac{d}{dt} e(t) \]</p>
 
-                <p>If you don't have any experience with calculus, this formula might seem a bit daunting at first, but hopefully it will be easier to digest by the end of this; all you'll need is some algebra. First, before we get our hands wet with simulations, I'll have to bore you a bit with what a control system is and how it works.</p>
+                <p>Now back up. This formula is very confusing if you're not familiar with calculus, and even if you are, what the heck is it supposed to mean? Hopefully, you'll gain an understanding for how the formula above works and an intuition for why PID does what it does.</p>
             </section>
 
             <section>
                 <h3>Control System Basics</h3>
 
-                <p>When a car wants to get to a certain speed or a furnace wants to get to the right temperature, we need a feedback loop, where the controller is constantly adjusting based on the current value. PID is one type of control system that uses a feedback loop.</p>
+                <p>Before we get into actual PID, we need to talk about what a control system even is. Whenever a machine needs to get to a certain target value, whether it be speed, pressure, or temperature, it still often have to use a control system to get there if the machine can't directly control that value.</p>
 
-                <p>Any control system has two important values: the <b>setpoint (SP)</b>, which is the target valueou want to get to, and the <b>proccess variable (PV)</b>, or the current value measured by a sensor that you want to get closer to the setpoint. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of ay control system is to reduce the error ideally to 0. Because all these values may be constatly changing with time, it's usually written as a function of time instead of as a variable.</p>
+                <p>For example, let's an air tank needs to get to a certain pressure. The compressor can't just immediately go to that pressure; it can only really pump in or release air. Instead of using fancy math to decide exactly how much air to pump in to get a specific pressure, the air tank can just determine whether to pump in or release air based on the current pressure and continually adjust until it reaches that desired pressure. This is called a <b>feedback loop</b>, where the control system continually adjusts its output based on the current and target values, a pivotal part of control systems.</p>
+
+                <p>Let's get down some terminology. The <b>setpoint (SP)</b> is just a fancy name for the target value, and the <b>proccess variable (PV)</b> is an even fancier name for the current value. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of any control system is to reduce the error to as close to 0 as possible, which would mean \( PV = SP \). Because all these values may be constatly changing over time, it's usually written as a function of time instead of as a variable.</p>
+
+                <p>It's extremely important that you get an intuition for the error. The error will be positive if \( PV < SP \) and negative if \( PV > SP \), and the larger the difference between the two, the farther from 0 the error will be.</p>
 
                 <p class="equation">\[ e(t) = SP(t) - PV(t) \]</p>
 
-                <p>Before delving into actual PID, let's take a look at a more naive control system as a example: <b>bang-bang (BB) control</b>. In BB control, when \(PV < SP\) (the error is positive), the controller output (CO) will be set to positive 1: forward, and when \(PV > SP\) (the error is negative), the controller output will be set to -1: reverse. This means that our controller only has two discreet states (technically 3, but an error of zero is unrealistic).</p>
+                <p>Before delving into actual PID, let's take a look at a simpler but less effective control system as a example: <b>bang-bang (BB) control</b>. In BB control, when the error is positive, the controller output (CO) will be set to positive constant, and when the error is negative, the controller output will be set to a negative constant. This means that our controller only has two discreet states. (Technically 3, but an error of zero can be ignored in real applications).</p>
 
                 <p class="equation">\[ CO(t) = \begin{cases} 
                     -C, & e(t)<0 \\ 
                     C, & e(t)>0 \\ 
                     0, & e(t)=0
-                \end{cases} \, \, \, \, \text{where C is a constant} \]</p>
+                \end{cases}</p>
 
-                <p>Let's take the example of a car, which will start 10 meters from a parking spot and will try to get as close as possible. Let's pretend that the controller can set the acceleration of the car instantaneously forward and backward up to 1 m/s<sup>2</sup>. This is a very simplistic model, but it should work for the purpose of this.</p>
+                <p> For this article, let's use a car as our model, which will try to get to a certain position. Our car will be able to instantaneously set its acceleration, but cannot directly control its speed or position, kind of like how we apply gas or the brakes to accelerate or decelerate the car.</p>
 
-                <p>Let's take a look at BB Control in action! Pay attention to the error, acceleration, and velocity, and play around with the sliders:</p>
+                <p>Let's take a look at BB Control in action! You can set the setpoint with the slider under the car, and then press play to watch the car go. The bars above the car represent the direction and magnitude of the error and acceleration. The error is just the signed distance between the car and setpoint, and you should be able to see its relationship with the acceleration. Try playing around will the acceleration slider and see what happens!</p>
 
                 <figure id="BBCarSim1">
                     <div class="graphPanel">
-                        <div class="carSim">
-                            <img class="car" src="images/car.png" />
-                            <div class="setpointLine"></div>
-                        </div>
-                        <div class="errorBracket"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
+                        <label>Acceleration:</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed1">20.00</label>
-                        </div>
-                        <hr />
-                        <label>Acceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
-                            <label for="acc1">10.00</label>
+                            <input id="acc1" class="accInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="acc1"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -81,38 +75,27 @@
                     </div>
                 </figure>
 
-                <p>As you can see, it's not great. After all, it's not like you start braking right when you hit the crosswalk; a good control system needs some amount of prediction. Bang-bang control tends to osscilate indefinitely. You can decrease the max speed to minimize overshoot, but then it takes much longer.</p>
+                <p>As you can see, it's not great. BB Control tends to be kind of a blunt hammer, with just the 2 states for the acceleration causing the position to continually overshoot and oscillate indefinitely. Even changing the acceleration doesn't remedy the problem, as it's hard to balance the sensitivity of the system while still trying to make the car arrive quickly. As a result, bang-bang control is only used for things like thermostats, where speed and precision aren't that important, and all of the changes are slow.</p>
 
-                <p>Instead of this clunky animation, let's use a graph. The horizontal axis will show how much time has elapsed in seconds, vertical axis will show displacement. The blue dashed line shows the target setpoint, and the red line shows the proccess variable over time. An additional green line will show the error over time. The closer the error is to 0, the better.</p>
+                <p>While the animations are nice, graphs are a great way of visualising the motion of the car. The red graph will represent the PV, and the blue graph will represent the SP.</p>
 
                 <figure id="BBCarSim2">
                     <div class="graphPanel">
-                        <div class="carSim">
-                            <img class="car" src="images/car.png" />
-                            <div class="setpointLine"></div>
-                        </div>
-                        <div class="errorBracket"></div>
-                        <div class="graph"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. COnsider switching to a different browser or updating.
+                        </canvas>
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
+                        <label>Acceleration:</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed1">20.00</label>
-                        </div>
-                        <hr />
-                        <label>Acceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
-                            <label for="acc1">10.00</label>
+                            <input id="acc2" class="accInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="acc2"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -122,25 +105,26 @@
                     </div>
                 </figure>
 
-                <p>Often, we will want to use control block diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
+                <p>Often, we will want to use control block diagrams to show how a control system works. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
 
                 <img class="diagram" src="images/bbDiagram.svg" />
 
-                <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
+                <p>As we move on to more complicated control systems, make sure you understna dhow the control loop feeds into itself, processing the error and attempting to drive it to 0.</p>
             </section>
 
+            <!--
             <section>
                 <h3>P Controller: Getting There</h3>
 
-                <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output.</p>
+                <p>Let's start with just a P controller and leave out the I and D. The P stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output.</p>
 
-                <p>Let's put it in numerical terms. If we make the controller output equal to the error, this will achieve the desired results. However, we want to multiply the error by a constant to scale it if we want to make it faster or slower. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
+                <p>In mathematical terms, we can set the controller output equal to the error and achieve the desired result. However, we will probably want to multiply the error by a constant to scale it if we want to make it faster or slower, adjusting it to just hte right value. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
 
                 <p>Here is ther first part of our equation. As you can see, the controllers output (\(CO(t)\)) is directly proportional to the error.</p>
 
                 <p class="equation">\[ CO(t) = K_{p}e(t) \]</p>
 
-                <p>Try getting a feel for a P controller in this simulation, where we've added a bit of friction to have it represent reality just a bit more accurately. Notice how instead of having the acceleration be constant, it changes based on how close the error is to 0.</p>
+                <p>Try getting a feel for a P controller in this simulation, where we've added a tiny bit of friction to have it represent reality just a bit more accurately. Notice how instead of having the acceleration be constant, it changes based on how close the error is to 0. WHat happens when you increase and decrease the proportional gain?</p>
 
                 <figure id="PSim3">
                     <div class="graphPanel">
@@ -157,19 +141,19 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed3">20.00</label>
+                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="10" step="0.01" value="5">
+                            <label for="maxSpeed3"></label>
                         </div>
-                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
+                        <label>Damping:</label>
                         <div class="inputGroup">
-                            <input id="maxFricDec3" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
-                            <label for="maxFricDec3">2.50</label>
+                            <input id="damp3" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.03">
+                            <label for="damp3"></label>
                         </div>
                         <hr />
                         <label>P-Gain (K<sub>p</sub>):</label>
                         <div class="inputGroup">
-                            <input id="p3" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.10">
-                            <label for="p3">0.10</label>
+                            <input id="p3" class="pInput" type="range" min="0" max="20" step="0.01" value="10">
+                            <label for="p3"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -195,7 +179,7 @@
             <section>
                 <h3>PI Controller: A Little Push</h3>
 
-                <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea if you don't know calculus, but I'll try to give a basic idea for what it is in a sort of mini calculus crash course. If you're interested, you should learn more about integrals, as this is just a short and sloppy run-down.</p>
+                <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea if you don't know calculus, but I'll try to give a basic idea for what it is in a sort of mini calculus crash course. If you're already familiar with integrals, skip <a>here</a>.</p>
                 
                 <p>Put simply, the integral is the area under the graph of a function. Integrals are often notated with a weird S-shape:</p>
 
@@ -215,13 +199,11 @@
                 <img src="images/riemann2.png" alt="Riemann Sum Medium" />
                 <img src="images/riemann3.png" alt="Riemann Sum Thin" />
 
-                <p>If you're still unsure about integrals and Riemann Sums, here's a little embed from Desmos that you can play around with.</p>
+                <p>If you're still unsure about integrals and Riemann Sums, check out this interactive Desmos model <a href="https://www.desmos.com/calculator/fzh4qds1zj" target="blank">here</a>. Come back when you get a feel for integrals.</p>
 
                 <p>We are now ready for PI COntrol.</p>
 
-                <p>We want to find the integral of the error function. Given how the error is a recursive function, constantly adjusting to itself in real time, we can't really find the integral analytically.</p>
-
-                <p>This is where Riemann sums come in. No control system can reasonably iterate at every single moment; there always has to be some sort of frame rate or small tick of time where the control system waits in between iterations. We can take advantage of this to approximate an integral.</p>
+                <p>We want to find the integral of the error function. This is where Riemann sums come in. No control system can reasonably iterate at every single moment; there always has to be some sort of frame rate or small tick of time where the control system waits in between iterations. Because these ticks are very small, we can make a very good approximation of the integral with Riemann Sums.</p>
 
                 <p>Riemann pi image</p>
 
@@ -233,7 +215,7 @@
 
                 <p>As you can see, we've taken the P term from our P Controller and just added an integral to the end. We also have a similar \(K_{i}\), which we multiply with the integral in order to give it more or less weight. This is called the <b>i-gain</b></p>
 
-                <p>Now you might be thinking, how is the integral supposed to make it better? Before I answer, try fiddling around with it in a simulation. What does the integral do? What happens if you give it more or less weight?</p>
+                <p>Now you might be thinking, how is the integral supposed to make it better? First, try fiddling around with it in a simulation. What does the integral do? What happens if you give it more or less weight?</p>
 
                 <figure id="PISim4">
                     <div class="graphPanel">
@@ -251,24 +233,24 @@
                         <h4>Controls</h4>
                         <label>Max Speed (m/s):</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed4" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed4">20.00</label>
+                            <input id="maxSpeed4" class="maxSpeedInput" type="range" min="0" max="10" step="0.01" value="5">
+                            <label for="maxSpeed4"></label>
                         </div>
-                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
+                        <label>Damping:</label>
                         <div class="inputGroup">
-                            <input id="maxFricDec4" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
-                            <label for="maxFricDec4">2.50</label>
+                            <input id="damp4" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.03">
+                            <label for="damp4"></label>
                         </div>
                         <hr />
                         <label>P-Gain (K<sub>p</sub>):</label>
                         <div class="inputGroup">
-                            <input id="p4" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.2">
-                            <label for="p4">0.20</label>
+                            <input id="p4" class="pInput" type="range" min="0" max="20" step="0.01" value="10">
+                            <label for="p4"></label>
                         </div>
                         <label>I-Gain (K<sub>i</sub>):</label>
                         <div class="inputGroup">
-                            <input id="i4" class="iInput" type="range" min="0" max="0.05" step="0.005" value="0.01">
-                            <label for="i4">0.01</label>
+                            <input id="i4" class="iInput" type="range" min="0" max="0.5" step="0.01" value="0.25">
+                            <label for="i4">0.1</label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -282,14 +264,14 @@
 
                 <p>Can you see how this could get rid of our pesky steady-state error? With PI Control, the steady state error will continue to increase the area under the curve even if the error stays the same. As a result, it will gruadually drive the acceleration to overcome the friction. In a sense, the integral term is way to keep pushing the controller to adjust its value.</p>
 
-                <p>It's a big balancing act, however. An i-gain too small could lead to the error being reduced too slowly, with a steady state error basically coming back. On the other hand, if the i-gain is too big, it could cause the PV to overshoot the SP and overshoot again when trying to adjust back, causing the system to oscillate back and forth out of control. It's crucial that you understand how the i-term works in order to find that sweet spot.</p>
+                <p>It's a big balancing act, however. An i-gain too small could lead to the error being reduced too slowly, with a steady state error basically coming back. On the other hand, if the i-gain is too big, it could cause the PV to overshoot the SP and overshoot again when trying to adjust back, causing the system to oscillate back and forth out of control. Even though it's very exxagerated in this model, you can see how the i-gain still overshoots quite a bit, which is a problem with PI Controllers.</p>
 
                 <p>We can add another element to our control block diagram, which adds the i-term to our previous p-term.</p>
 
                 <p>PI control block diagram</p>
 
                 <p>PI Controllers are very powerful, and in some cases enough. There are many systems that use a PI controller. But, if you want even greater precision and efficiency, look no further that the full PID Controller!</p>
-            </section>
+            </section> -->
         </article>
     </body>
 
