@@ -41,7 +41,7 @@ section:nth-child(2) {
 
 section:nth-child(3) {
     --background: #fafc8b;
-    --dark-background: #fcff57;
+    --dark-background: #fbff00;
 }
 
 section:nth-child(4) {
@@ -91,8 +91,8 @@ h3 {
     margin-top: 3vw;
     margin-bottom: 2vw;
     background-color: var(--dark-background);
-    border-bottom: 1vh solid var(--background);
-    padding: 5vh 10vw 2vh;
+    border-bottom: 3vh solid var(--background);
+    padding: 5vh 10vw 1vh;
 }
 
 p {
@@ -114,4 +114,9 @@ section > img {
 
 img.diagram {
     width: 80%;
+}
+
+iframe .desmos {
+    border: 1px solid #ccc;
+    margin-bottom: 2vw;
 }

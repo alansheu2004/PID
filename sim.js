@@ -1,20 +1,27 @@
-function Sim(figureId, getAcc) {
+function Sim(figureId, getAcc, adjustAcc, adjustVel, noise) {
     sims.push(this);
 
     this.figureId = figureId;
     this.figure = document.getElementById(figureId);
+    this.adjustAcc = adjustAcc;
+    this.adjustVel = adjustVel;
+    this.noise = noise;
 
     this.interval = 0.05;
 
     this.errorBar = document.querySelector("#" + figureId + " .errorBar");
     this.accBar = document.querySelector("#" + figureId + " .accBar");
+    this.accPBar = document.querySelector("#" + figureId + " .accPBar") || null;
+    this.accIBar = document.querySelector("#" + figureId + " .accIBar") || null;
+    this.accDBar = document.querySelector("#" + figureId + " .accDBar") || null;
+
     this.car = document.querySelector("#" + figureId + " .car");
     this.spSlider = document.querySelector("#" + figureId + " .spSlider");
 
     this.graph = document.querySelector("#" + figureId + " .graph") || null;
     if(this.graph) {
         this.ctx = this.graph.getContext("2d");
-        this.graphDuration = 5;
+        this.graphDuration = 15;
         this.graphTicks = this.graphDuration/this.interval;
     }
 
@@ -43,8 +50,15 @@ function Sim(figureId, getAcc) {
         }
         
         this.acc = getAcc(this);
+        for(let adjustAcc of this.adjustAcc) {
+            adjustAcc(this);
+        }
         this.vel += this.acc * this.interval;
+        for(let adjustVel of this.adjustVel) {
+            adjustVel(this);
+        }
         this.pv += this.vel * this.interval;
+        this.pv += (Math.random()-0.5)*document.querySelector("#" + this.figureId + " .noiseInput").value
 
         this.lastError = this.error;
 
@@ -62,6 +76,21 @@ function Sim(figureId, getAcc) {
 
         this.accBar.style.left = (this.pv + Math.min(0,this.acc))*100 + "%";
         this.accBar.style.width = Math.abs(this.acc)*100 + "%";
+
+        if(this.accPBar) {
+            this.accPBar.style.left = (this.pv + Math.min(0,this.accP))*100 + "%";
+            this.accPBar.style.width = Math.abs(this.accP)*100 + "%";
+        }
+
+        if(this.accIBar) {
+            this.accIBar.style.left = (this.pv + Math.min(0,this.accI))*100 + "%";
+            this.accIBar.style.width = Math.abs(this.accI)*100 + "%";
+        }
+
+        if(this.accDBar) {
+            this.accDBar.style.left = (this.pv + Math.min(0,this.accD))*100 + "%";
+            this.accDBar.style.width = Math.abs(this.accD)*100 + "%";
+        }
 
         if(this.graph) {
             this.ctx.clearRect(0, 0, this.graph.width, this.graph.height);
@@ -108,7 +137,7 @@ function Sim(figureId, getAcc) {
     this.reset = function() {
         this.spSlider.value = 0.5;
         this.sp = this.spSlider.value;
-        this.pv = 0.25;
+        this.pv = 0.1;
 
         this.sps = [];
         this.pvs = [];
@@ -143,16 +172,38 @@ function getAccBB(sim) {
 }
 
 function getAccP(sim) {
-    return document.querySelector("#" + sim.figureId + " .pInput").value * sim.error;
+    sim.accP = document.querySelector("#" + sim.figureId + " .pInput").value * sim.error;
+    return sim.accP;
 }
 
 function getAccPI(sim) {
-    return getAccP(sim) + document.querySelector("#" + sim.figureId + " .iInput").value * sim.integral;
+    sim.accI = document.querySelector("#" + sim.figureId + " .iInput").value * sim.integral;
+    return getAccP(sim) + sim.accI;
+}
+
+function getAccPID(sim) {
+    sim.accD = document.querySelector("#" + sim.figureId + " .dInput").value * sim.derivative;
+    return getAccPI(sim) + sim.accD;
+}
+
+function minAcc(sim) {
+    if(Math.abs(sim.vel) < 0.05 && Math.abs(sim.acc) < document.querySelector("#" + sim.figureId + " .minAccInput").value) {
+        sim.acc = 0;
+    }
+}
+
+function damp(sim) {
+    sim.vel *= 1.0-document.querySelector("#" + sim.figureId + " .dampInput").value;
 }
 
 function createSims() {
-    BBCarSim1.sim = new Sim("BBCarSim1", getAccBB);
-    BBCarSim2.sim = new Sim("BBCarSim2", getAccBB);
+    BBSim1.sim = new Sim("BBSim1", getAccBB, [], []);
+    BBSim2.sim = new Sim("BBSim2", getAccBB, [], []);
+    PSim3.sim = new Sim("PSim3", getAccP, [], []);
+    PSim4.sim = new Sim("PSim4", getAccP, [minAcc], [damp]);
+    PISim5.sim = new Sim("PISim5", getAccPI, [minAcc], [damp]);
+    PIDSim6.sim = new Sim("PIDSim6", getAccPID, [minAcc], [damp]);
+    PIDSim7.sim = new Sim("PIDSim7", getAccPID, [minAcc], [damp], true);
 }
 
 var sims = [];
