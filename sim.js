@@ -58,7 +58,9 @@ function Sim(figureId, getAcc, adjustAcc, adjustVel, noise) {
             adjustVel(this);
         }
         this.pv += this.vel * this.interval;
-        this.pv += (Math.random()-0.5)*document.querySelector("#" + this.figureId + " .noiseInput").value
+        if(this.noise) {
+            this.pv += (Math.random()-0.5)*document.querySelector("#" + this.figureId + " .noiseInput").value
+        }
 
         this.lastError = this.error;
 

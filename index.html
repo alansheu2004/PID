@@ -32,7 +32,7 @@
 
                 <p>Before we get into actual PID, we need to talk about what a control system even is. Whenever a machine needs to get to a certain target value, whether it be speed, pressure, or temperature, it still often have to use a control system to get there if the machine can't directly control that value.</p>
 
-                <p>For example, let's an air tank needs to get to a certain pressure. The compressor can't just immediately go to that pressure; it can only really pump in or release air. Instead of using fancy math to decide exactly how much air to pump in to get a specific pressure, the air tank can just determine whether to pump in or release air based on the current pressure and continually adjust until it reaches that desired pressure. This is called a <b>feedback loop</b>, where the control system continually adjusts its output based on the current and target values, a pivotal part of control systems.</p>
+                <p>For example, let's an air tank needs to get to a certain pressure. The compressor can't just immediately go to that pressure; it can only really pump in or release air. Instead of using fancy math to decide exactly how much air to pump in to get a specific pressure, the air tank can just determine whether to pump in or release air based on the current pressure and continually adjust until it reaches that desired pressure. This is called a <b>feedback loop</b>, where the control system determines a value to output to the <b>plant</b>, or the process that does the physical actuation, and the plant returns its current measurement back to the control system for it to determine another output.</p>
 
                 <p>Let's get down some terminology. The <b>setpoint (SP)</b> is just a fancy name for the target value, and the <b>proccess variable (PV)</b> is an even fancier name for the current value. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of any control system is to reduce the error to as close to 0 as possible, which would mean \( PV = SP \). Because all these values may be constatly changing over time, it's usually written as a function of time instead of as a variable.</p>
 
@@ -296,7 +296,7 @@
 
                 <p>But first, we can add another element to our control block diagram:</p>
 
-                <p>PI control block diagram</p>
+                <img class="diagram" src="images/piDiagram.svg" />
             </section>
 
             <section>
@@ -427,9 +427,11 @@
                     </div>
                 </figure>
 
-                <p>And that's a basic overview of PID! To recap, here's a little control block diagram:</p>
+                <p>Try turning on and off the Derivative gain. You can see that the vibration in the data is handled better with just a PI controller than with the PID controller as the D-term just seems to randomly fluctuate, creating instability. In cases where the data may vary like that, it's probably better to just use a PI controller.</p>
 
-                <p>Control block diagram PID</p>
+                <p>And that's our overview of PID! To recap, here's a little control block diagram:</p>
+
+                <img class="diagram" src="images/pidDiagram.svg" />
 
                 <p>But now that we've learned the theoretical bits, time to figure out how to actually implement what we've learned.</p>
             </section>
