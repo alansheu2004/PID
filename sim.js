@@ -204,12 +204,12 @@ function noise(sim) {
 }
 
 function createSims() {
-    BBSim1.sim = new Sim("BBSim1", getAccBB, [], []);
-    BBSim2.sim = new Sim("BBSim2", getAccBB, [], []);
-    PSim3.sim = new Sim("PSim3", getAccP, [], []);
-    PSim4.sim = new Sim("PSim4", getAccP, [minAcc], [damp]);
-    PISim5.sim = new Sim("PISim5", getAccPI, [minAcc], [damp]);
-    PIDSim6.sim = new Sim("PIDSim6", getAccPID, [minAcc], [damp]);
+    BBSim1.sim = new Sim("BBSim1", getAccBB, [], [], []);
+    BBSim2.sim = new Sim("BBSim2", getAccBB, [], [], []);
+    PSim3.sim = new Sim("PSim3", getAccP, [], [], []);
+    PSim4.sim = new Sim("PSim4", getAccP, [minAcc], [damp], []);
+    PISim5.sim = new Sim("PISim5", getAccPI, [minAcc], [damp], []);
+    PIDSim6.sim = new Sim("PIDSim6", getAccPID, [minAcc], [damp], []);
     PIDSim7.sim = new Sim("PIDSim7", getAccPID, [minAcc], [damp], [noise]);
     PIDSim8.sim = new Sim("PIDSim8", getAccPID, [minAcc], [damp], [noise]);
 }
