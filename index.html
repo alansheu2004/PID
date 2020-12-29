@@ -524,7 +524,109 @@
 
                 <p>And that's it. Change in error over change in time. That's it for coding PID. Of course there's much more you can do such as a bias terms and feed-forward, and there may be specific tweaks in specific languages such as in object-oriented languages. I recommend doing some of your own research on PID and even take a look at some examples. It never hurts to just take a look at the work others have done!</p>
 
-                <p>If you're interested on trying some PID programming, check out <a href="https://janismac.github.io/ControlChallenges/">JanisMac's Control Challenges. See if you can implement PID and even try tuning it!</a></p>
+                <p>If you're interested on trying some PID programming, check out <a href="https://janismac.github.io/ControlChallenges/">JanisMac's Control Challenges</a>. See if you can implement PID and even try tuning it!</p>
+            </section>
+
+            <section>
+                <h3>________<br/> Tuning PID</h3>
+
+                <p>Now we come to the crux of PID: tuning. Even if you have the most advanced control system in the world, it will amount to nothing if you don't tune it to its specific condition. For PID, you have to tune the three gains, adjusting them to suit whatever need your system requires.</p>
+
+                <p>Because the constants of PID are not connected to any physical properties, they must be determined experimentally rather than analytically, and these values often vary wildly with different systems. There are some algorithms that take experimental data to tune optimal gains such as the Ziegler–Nichols, and many softwares that can automatically find the optimal PID parameters, all of which you can find more about online. For this article, we'll just go with manual tuning. Note that this doesn't mean everything is done by hand, just the determination of the gains; almost all applications of PID are electronic, and it's very useful to use softwhere that can graph the data to analyze.</p>
+
+                <p>Also, remember that different systems will have different needs to meet and may require different tuning methods to achieve optimal results. This will just be a very general guide (that I definitely did not steal from Wikipedia), but always use knowledge specific to whatever application and past experience as guides.</p>
+
+                <ol>
+                    <li>Set all the gains to 0 as a baseline. The plant should have no response.</li>
+                    <li>Slowly increase the p-gain until the PV begins to oscillate around the setpoint in a wave. You should do this between trials, looking at the graph between each trial and not dynamically chnaging it as it runs.</li>
+                    <li>Approximately cut the p-gain in half. This should lead to a decay in the amplitude.</li>
+                    <li>Now slowly increase the i-gain to overcome whatever steady-state error or damping. The error should hopefully converge onto 0. Be careful, as too much i-gain can lead to overshoot and oscillation or divergence.</li>
+                    <li>If needed, slowly increase the d-gain until satisfaction. Note that while this should decrease the overshoot and make it less wobbly, it could increase the response time if too high. It all depends on what you value: precision or speed.</li>
+                    <li>Adjust your gains or do it over again until its as perfect as you need!</li>
+                </ol>
+
+                <p>This series of images (from Wikipedia, of course), is a demonstration of what this process might look like:</p>
+
+                <img src="images/pidTuning.gif" alt="PID Tuning Demo" /><br />
+
+                <table>
+                    <tr>
+                        <td>
+                            <img src="images/varyP.jpg" alt="Varying Kp" class="gallery" />
+                            <small>Varying K<sub>p</sub>, keeping K<sub>i</sub> & K<sub>d</sub> constant</small>
+                        </td>
+                        <td>
+                            <img src="images/varyI.png" alt="Varying Ki" class="gallery" />
+                            <small>Varying K<sub>i</sub>, keeping K<sub>p</sub> & K<sub>d</sub> constant</small>
+                        </td>
+                        <td>
+                            <img src="images/varyD.png" alt="Varying Kd" class="gallery" />
+                            <small>Varying K<sub>d</sub>, keeping K<sub>p</sub> & K<sub>i</sub> constant</small>
+                        </td>
+                    </tr>
+                </table>
+
+                <p>And remember, if there is a better way to tune for your specific application, go for that! Sometimes there are standards that you can set the gains to and then adjust from that!</p>
+
+                <p>This article is just a basic overview of the process of PID, and I hope it sparked some interest, if not at least educated you a bit. There are always more levels to go down, more things you can refine with PID and controls systems beyond with crazy linear algebra. I encourage you to go ahead and explore for yourself if you're interested!</p>
+
+                <p>Finally, here's one last simulation with everything I can think of:</p>
+
+                <figure id="PIDSim8">
+                    <div class="graphPanel">
+                        <div class="errorBar">e</div>
+                        <div class="accPBar">acc<sub>p</sub></div>
+                        <div class="accIBar">acc<sub>i</sub></div>
+                        <div class="accDBar">acc<sub>d</sub></div>
+                        <div class="accBar">acc<sub>total</sub></div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p8" class="pInput" type="range" min="0" max="3" step="0.01" value="0">
+                            <label for="p8"></label>
+                        </div>
+                        <label>I-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="i8" class="iInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="i8"></label>
+                        </div>
+                        <label>D-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="d8" class="dInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="d8"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp8" class="dampInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="damp8"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc8" class="minAccInput" type="range" min="0" max="0.1" step="0.001" value="0">
+                            <label for="minAcc8"></label>
+                        </div>
+                        <label>Random Noise:</label>
+                        <div class="inputGroup">
+                            <input id="noise8" class="noiseInput" type="range" min="0" max="0.05" step="0.001" value="0">
+                            <label for="noise8"></label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
+
             </section>
         </article>
     </body>

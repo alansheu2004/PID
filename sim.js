@@ -1,10 +1,11 @@
-function Sim(figureId, getAcc, adjustAcc, adjustVel, noise) {
+function Sim(figureId, getAcc, adjustAcc, adjustVel, adjustPV) {
     sims.push(this);
 
     this.figureId = figureId;
     this.figure = document.getElementById(figureId);
     this.adjustAcc = adjustAcc;
     this.adjustVel = adjustVel;
+    this.adjustPV = adjustPV;
     this.noise = noise;
 
     this.interval = 0.05;
@@ -58,8 +59,8 @@ function Sim(figureId, getAcc, adjustAcc, adjustVel, noise) {
             adjustVel(this);
         }
         this.pv += this.vel * this.interval;
-        if(this.noise) {
-            this.pv += (Math.random()-0.5)*document.querySelector("#" + this.figureId + " .noiseInput").value
+        for(let adjustPV of this.adjustPV) {
+            adjustPV(this);
         }
 
         this.lastError = this.error;
@@ -198,6 +199,10 @@ function damp(sim) {
     sim.vel *= 1.0-document.querySelector("#" + sim.figureId + " .dampInput").value;
 }
 
+function noise(sim) {
+    sim.pv += (Math.random()-0.5)*document.querySelector("#" + sim.figureId + " .noiseInput").value;
+}
+
 function createSims() {
     BBSim1.sim = new Sim("BBSim1", getAccBB, [], []);
     BBSim2.sim = new Sim("BBSim2", getAccBB, [], []);
@@ -205,7 +210,8 @@ function createSims() {
     PSim4.sim = new Sim("PSim4", getAccP, [minAcc], [damp]);
     PISim5.sim = new Sim("PISim5", getAccPI, [minAcc], [damp]);
     PIDSim6.sim = new Sim("PIDSim6", getAccPID, [minAcc], [damp]);
-    PIDSim7.sim = new Sim("PIDSim7", getAccPID, [minAcc], [damp], true);
+    PIDSim7.sim = new Sim("PIDSim7", getAccPID, [minAcc], [damp], [noise]);
+    PIDSim8.sim = new Sim("PIDSim8", getAccPID, [minAcc], [damp], [noise]);
 }
 
 var sims = [];

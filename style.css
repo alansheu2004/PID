@@ -66,7 +66,7 @@ section:nth-child(6) {
 }
 
 section:nth-child(7) {
-    --background: #edd6fc;
+    --light-background: #e9c6ff;
     --background: #d18bfc;
     --dark-background: #bf57ff;
 }
@@ -114,6 +114,13 @@ p {
     line-height: 1.5;
 }
 
+ol {
+    font-size: 12pt;
+    margin: 0 20vw 2vw;
+    text-align: left;
+    line-height: 1.5;
+}
+
 p.equation {
     display: inline-block;
     background-color: var(--background);
@@ -143,4 +150,15 @@ code {
     font-family: Consolas, 'Courier New', monospace;
     background-color: var(--light-background);
     border-radius: 5px;
+}
+
+table {
+    width: 70%;
+    margin: 2vw auto;
+}
+
+td img.gallery {
+    width: 90%;
+    display: block;
+    margin: auto;
 }
