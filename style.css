@@ -21,52 +21,59 @@ body {
 }
 
 article {
-    padding: 2% 0;
 }
 
 section {
     text-align: center;
-    margin-bottom: 8vh;
+    padding-bottom: 6vh ;
+    background-image: linear-gradient(to right, var(--light-background) 0%, white 7%, white 93%, var(--light-background) 100%) ;
 }
 
 :root, section:nth-child(1) {
+    --light-background: #fccfcf;
     --background: #fc8b8b;
     --dark-background: #ff5757;
 }
 
 section:nth-child(2) {
+    --light-background: #ffe1c7;
     --background: #fcc28b;
     --dark-background: #ffab57;
 }
 
 section:nth-child(3) {
+    --light-background: #feffd6;
     --background: #fafc8b;
     --dark-background: #fbff00;
 }
 
 section:nth-child(4) {
+    --light-background: #cffcc9;
     --background: #98fc8b;
     --dark-background: #6bff57;
 }
 
 section:nth-child(5) {
+    --light-background: #cbfffc;
     --background: #8bfcf4;
     --dark-background: #57fff7;
 }
 
 section:nth-child(6) {
+    --light-background: #d2d0ff;
     --background: #918bfc;
     --dark-background: #5f57ff;
 }
 
 section:nth-child(7) {
+    --background: #edd6fc;
     --background: #d18bfc;
     --dark-background: #bf57ff;
 }
 
 h1 {
     text-align: center;
-    font-size: 8vh;
+    font-size: 48pt;
     background-color: var(--dark-background);
     padding: 10vh 0 2vh;
 }
@@ -78,9 +85,15 @@ h1 #titleImage {
 
 h2 {
     text-align: center;
-    font-size: 3vh;
-    margin-bottom: 2vw;
+    font-size: 24pt;
     background-color: var(--background);
+    padding: 2vh 0;
+}
+
+h5 {
+    text-align: center;
+    font-size: 18pt;
+    background-color: var(--dark-background);
     padding: 2vh 0;
 }
 
@@ -88,17 +101,17 @@ h3 {
     display: block;
     text-align: left;
     font-size: 3.5vh;
-    margin-top: 3vw;
     margin-bottom: 2vw;
     background-color: var(--dark-background);
     border-bottom: 3vh solid var(--background);
-    padding: 8vh 10vw 1vh;
+    padding: 12vh 10vw 1vh;
 }
 
 p {
     font-size: 12pt;
     margin: 0 15vw 2vw;
     text-align: justify;
+    line-height: 1.5;
 }
 
 p.equation {
@@ -113,10 +126,21 @@ section > img {
 }
 
 img.diagram {
-    width: 80%;
+    width: 50%;
 }
 
 iframe .desmos {
     border: 1px solid #ccc;
-    margin-bottom: 2vw;
+}
+
+code {
+    display: block;
+    text-align: left;
+    padding: 20px;
+    margin: 0 auto 2vw;
+    width: 50%;
+    font-size: 14pt;
+    font-family: Consolas, 'Courier New', monospace;
+    background-color: var(--light-background);
+    border-radius: 5px;
 }

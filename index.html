@@ -9,6 +9,7 @@
     </head>
 
     <body>
+        <h5>by Alan Sheu</h5>
         <h1>
             <img id="titleImage" src="images/pidIcon.svg" />
             <br />
@@ -18,17 +19,19 @@
 
         <article>
             <section>
-                <p>Whether you know it or not, PID is found in the machines and processes all around you. In the motors of an electric fan or the temperature settings of an oven, chances are there is some form of PID at work. So what is PID?</p>
+                <p style="padding-top: 3vw;">Whether you know it or not, PID is found in the machines and processes all around you. In the motors of an electric fan or the temperature settings of an oven, chances are there is some form of PID at work. So what is PID?</p>
 
                 <p>Formally, PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
 
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d} e'(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \,dT + K_{d} e'(t) \]</p>
 
                 <p>Now back up. This formula is very confusing if you're not familiar with calculus, and even if you are, what the heck is it supposed to mean? Hopefully, you'll gain an understanding for how the formula above works and an intuition for why PID does what it does.</p>
+
+                <p>A quick note on prerequisites. Some knowledge on calculus would be helpful, but as I will all the calculus concepts, all you really need to have down is some algebra. There's some physics in the example, but all you really need to know is that acceleration is change in velocity. As for coding, I'll be using pseudocode, but some knowledge in any programming language is always helpful.</p>
             </section>
 
             <section>
-                <h3>Control System Basics</h3>
+                <h3>________<br/> Control System Basics</h3>
 
                 <p>Before we get into actual PID, we need to talk about what a control system even is. Whenever a machine needs to get to a certain target value, whether it be speed, pressure, or temperature, it still often have to use a control system to get there if the machine can't directly control that value.</p>
 
@@ -115,7 +118,7 @@
             </section>
 
             <section>
-                <h3>P Controller: Getting There</h3>
+                <h3>________<br/> P Controller: Getting There</h3>
 
                 <p>Let's start with just a P controller and leave out the I and D. The P stands for proportional, meaning the control output will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output. This should help limit the oscillation from BB control, as a smaller error would mean less of a push, right?</p>
 
@@ -155,7 +158,7 @@
 
                 <p>Eh. Not much better is it? P-Control is advantageous to BB-Control as it oscillates less frequently, making it preferrable where some stability is needed. However, it still oscillates, which is a problem for us trying to minimize ther error as quickly and efficiently as possible.</p>
 
-                <p>Here is where we introduce <b>damping</b>. Almost any mechanical system will experience some sort of damping, where energy is lost due to some resistive forces. In our example, damping could be caused by air resistance or kinetic friction. Regardless, damping is a factor we can't control (expect for in simulations). We can still use it to our advantage though, and adjust our P-Gain to match it.</p>
+                <p>Here is where we introduce <b>damping</b>, or a loss of energy over time. Almost any mechanical system will experience some sort of damping; in our example, it could be caused by air resistance or kinetic friction. Regardless, damping is a factor we can't always control (expect for in simulations). We can still use it to our advantage though, and adjust our P-Gain to match it.</p>
 
                 <p>We'll use a pretty simple model for damping, just multiplying the velocity by a constant. A damping of 0 means that the velocity will not be changed, whereas a damping of 1 means that the velocity would always be 0. This damping tends to be close to 0 but not negligible.
                     
@@ -212,7 +215,7 @@
             </section>
 
             <section>
-                <h3>PI Controller: A Little Push</h3>
+                <h3>________<br/> PI Controller: A Little Push</h3>
 
                 <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea. If you are already familiar with calculus, feel free to skim or skip ahead. Otherwise, here's the gist.</p>
                 
@@ -236,7 +239,7 @@
 
                 <p>We are now ready for PI COntrol. For our updated PI control system, here is the equation:</p>
 
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int e(t) \, dt \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \, dT \]</p>
 
                 <p>Now slow down! As you can see, we've taken the P term from our P Controller and just added an integral term to the end. We also have a similar \(K_{i}\) constant, which we multiply with the integral in order to give it more or less weight. This is called the <b>i-gain</b></p>
 
@@ -300,7 +303,7 @@
             </section>
 
             <section>
-                <h3>PID Controller: Predicting the Future</h3>
+                <h3>________<br/> PID Controller: Predicting the Future</h3>
 
                 <p>For those applications where a simple PI controller just won't cut it, here's where the Derivative "D" term decomes useful.</p>
 
@@ -312,7 +315,7 @@
 
                 <p>Like before, we will add an additional derivative term to our equation: our final equation for PID! Can you guess what the derivative will do?</p>
 
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d} e'(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \,dT + K_{d} e'(t) \]</p>
 
                 <p>If you read the section title, you can probably tell. The derivative term is there to rein the controller back, to tell the controller to slow down before it creashes into a lamppost or something. Still not sure? Try a simulation:</p>
 
@@ -366,9 +369,9 @@
                     </div>
                 </figure>
 
-                <p>Taking a look at the vectors, you can see that the derivative action often works against the error, which seems counterintuitive, but balancing it with the P and I terms can achieve a nice effect. As the error is decreasing, meaning the derivative is negative, the derivative term itself will be negative, effectively limiting the slope so the overshoot will not be as large while the error approaches 0.</p>
+                <p>Taking a look at the vectors, you can see that the derivative action often works against the error, which seems counterintuitive, but balancing it with the P and I terms can achieve a nice effect. As the error is decreasing, meaning the derivative is negative, the derivative term itself will be negative, effectively limiting the slope so the overshoot will not be as large while the error approaches 0. While there may be a longer response time with PID compared to PI, there is significantly more stability with a lot less oscillation.</p>
 
-                <p>The derivative term has one fatal flaw though: noise. With any mechical system, there will be some random uncontrollable variations in the data whether it be from shaking, external events, or just imprecise measurements. Because the derivative term uses just the error's rate of change rather than its actual value like P or I, small changes in the measurements could be amplified by the derivative term and increase instability.</p>
+                <p>The derivative term has a fatal flaw though: <b>noise</b>. With any mechical system, there will be some random uncontrollable variations in the data whether it be from shaking, external events, or just imprecise measurements. Because the derivative term uses just the error's rate of change rather than its actual value like P or I, small changes in the measurements could be amplified by the derivative term and increase instability.</p>
 
                 <p>To simulate noise, let's multiply the alter the PV randomly by a small amount.</p>
 
@@ -434,6 +437,94 @@
                 <img class="diagram" src="images/pidDiagram.svg" />
 
                 <p>But now that we've learned the theoretical bits, time to figure out how to actually implement what we've learned.</p>
+            </section>
+
+            <section>
+                <h3>________<br/> Implementing PID</h3>
+
+                <p>Knowing PID is one thing, but implementing it is just a little bit more. You know how we just assumed that we could calculate the integral and derivative terms earlier? Well, here's where that comes into play.</p>
+
+                <p>Let's start with the integral. How do we even begin to calculate it? Well integrals are calculated with something called a Riemann Sum. Take the range where you want to integrate, and split it up into discrete chunks with a width of \( dx \). Now over each of those intervals, draw a rectangle with a width of dx and a height of f(x). The sum of each of the areas of the rectangles (of course with the ones below the x-axis being negative) approximates the integral, and as the interval is split into more pieces (and \( dx \) becomes smaller), this approximation gets better. In fact, this is the definition of an integral! In the notation, the integral sign represents a sum, adding up many values on the function and multiplying them by \( dx \) to get the area of each rectangle. That's what the notation actually represents!</p>
+
+                <iframe src="https://www.desmos.com/calculator/jxpe0vyzpj?embed" width="500px" height="500px" frameborder=0></iframe>
+
+                <p>Now in a calculus class, we'd try to calculate the integral or solution analytically, but let's leave the differential equation solving to the people way smarter and more qualified than me. Instead, we'll take advantage of the small time slices. When PID is actually used, the feedback loop can only cycle so fast, and each time the controller updates, we can update the integral by just adding the another small slice of area. For our purposes, there are 3 ways to do this. We'll use the Left Riemann Sums, but they're basically all about the same given small enough time steps.</p>
+
+                <p>3 integral methods</p>
+
+                <p>For the derivative, it's the same idea. the \( f'(x) \) notation is actually shorthand for \( \frac{df(x)}{dx} \), or the change in the function over the change in x, which should be familiar as the formula for slope. At each time step of our feedcback loop, our derivative can be calculated as the change in \( e(t) \) (current error - last error) divided by the change in time, or the time step.</p>
+
+                <p>Let's get coding! I'll be using some pseudocode, but you can probably apply the general idea to all programming languages.</p>
+
+                <p>First we just need to set up our variables and set up our update function that will be called in the feedback loop:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; return <i>something</i>
+                </code>
+
+                <p>Each time we update, we want to calculate an error based on the setpoint and process variable. The setpoint could vary quite a bit, and the proccess variable would come from whatever plant you're using. That could be from the pressure guage on an air tank or a speedometer, anything to measure your current PV. The plant would then take whatever is returned from this function to process. As for dt, it's just the time between cycles. You could have it be set on a timer to run on a certain period or have it run as fast as possible with an internal clock.</p>
+
+                <p>First, let's implement P:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/><br/>
+
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv <br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; return pTerm
+                </code>
+
+                <p>Simple. We're just taking the error and multiplying it by our proportional gain. Next, I:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    integral = 0 <br />
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv<br/>
+                    &emsp; integral += error * dt<br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; iTerm = Ki * integral<br/>
+                    &emsp; return pTerm + iTerm<br/>
+                </code>
+
+                <p>The integral is something that is persistent throughout the PID process, so we should define it outside of the function. Each time, we add the area of a little rectangle to approximate the integral. Note that if you want to use the Forward Euler method or Trapezoidal method, you have to keep track of the last error as well, and use that to help calculate the area of the rectangles or trapezoids respectively. We will have to use the last error for the derivative anyway.</p>
+
+                <p>And finally the derivative:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    integral = 0 <br />
+                    lastError = 0 <br />
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv<br/>
+                    &emsp; integral += error * dt<br/>
+                    &emsp; derivative = (error - lastError) / dt<br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; iTerm = Ki * integral<br/>
+                    &emsp; dTerm = Kd * derivative<br/>
+                    &emsp; return pTerm + iTerm + dTerm<br/>
+                </code>
+
+                <p>And that's it. Change in error over change in time. That's it for coding PID. Of course there's much more you can do such as a bias terms and feed-forward, and there may be specific tweaks in specific languages such as in object-oriented languages. I recommend doing some of your own research on PID and even take a look at some examples. It never hurts to just take a look at the work others have done!</p>
+
+                <p>If you're interested on trying some PID programming, check out <a href="https://janismac.github.io/ControlChallenges/">JanisMac's Control Challenges. See if you can implement PID and even try tuning it!</a></p>
             </section>
         </article>
     </body>
