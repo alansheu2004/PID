@@ -4,74 +4,78 @@
     <head>
         <title>PIDeconstructed</title>
 
-        <link type="text/css" rel="stylesheet" href="style.css" />
+        <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+        <link rel="manifest" href="favicon/site.webmanifest">
 
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <link type="text/css" rel="stylesheet" href="style.css" />
+        <link type="text/css" rel="stylesheet" href="figure.css" />
     </head>
 
     <body>
-        <h1>PIDeconstructed</h1>
+        <h5>by Alan Sheu</h5>
+        <h1>
+            <img id="titleImage" src="images/pidIcon.svg" />
+            <br />
+            PIDeconstructed
+        </h1>
         <h2>Getting from Point A to Point B</h2>
 
         <article>
             <section>
-                <p>Many mechanical component or industrial system you see today uses PID Control or some variant of it, commonly used for controlling the speed, temperature, pressure, or really anything controllable and measurable. Well, what is PID?</p>
+                <p style="padding-top: 3vw;">Whether you know it or not, PID is found in the machines and gadgets all around you. In the motors of an electric fan or the temperature settings of your water heater, chances are there is some form of PID at work. So what is PID?</p>
 
-                <p>PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
+                <p>Formally, PID Control is a feedback-loop control system that stands for <b>Proportional-Integral-Derivative Control</b> and uses the following formula:</p>
 
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(t) \,dt + K_{d}e'(t) \]</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \,dT + K_{d} e'(t) \]</p>
 
-                <p>If you don't have any experience with calculus, this formula might seem a bit daunting at first, but hopefully it will be easier to digest by the end of this; all you'll need is some algebra. First, before we get our hands wet with simulations, I'll have to bore you a bit with what a control system is and how it works.</p>
+                <p>Now back up. If you don't know calculus, it's really confusing, and even if you are, it may not be exactly clear as to what it's supposed to mean. Hopefully, you'll gain an understanding for how the formula above works and an intuition for why PID does what it does.</p>
+
+                <p>A quick note on prerequisites. Some knowledge on calculus would be helpful, but as I will try to explain the calculus concepts as well as I can, all you really need to have down is some algebra and a healthy dose of thinking. There's some physics in the example, but all you really need to know is that acceleration is change in velocity. As for coding, I'll be using pseudocode, but some knowledge in any programming language is always helpful.</p>
             </section>
 
             <section>
-                <h3>Control System Basics</h3>
+                <h3>________<br/> Control System Basics</h3>
 
-                <p>When a car wants to get to a certain speed or a furnace wants to get to the right temperature, we need a feedback loop, where the controller is constantly adjusting based on the current value. PID is one type of control system that uses a feedback loop.</p>
+                <p>Before we get into actual PID, we need to talk about what a control system even is. Whenever a machine needs to get to a certain target value, whether it be speed, pressure, or temperature, it still often have to use a control system to get there.</p>
 
-                <p>Any control system has two important values: the <b>setpoint (SP)</b>, which is the target valueou want to get to, and the <b>proccess variable (PV)</b>, or the current value measured by a sensor that you want to get closer to the setpoint. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of ay control system is to reduce the error ideally to 0. Because all these values may be constatly changing with time, it's usually written as a function of time instead of as a variable.</p>
+                <p>For example, let's an air tank needs to get to a certain pressure. The compressor can't just immediately go to that pressure; it can only really pump in or release air. While you could use fancy math to decide exactly how much air to pump in to get a specific pressure, the air tank can just determine whether to pump in or release air based on the current pressure and continually adjust until it reaches that desired pressure. This is called a <b>feedback loop</b>, where the <b>control system</b>, be it PID or something else, outputs a value to the <b>plant</b>, or the thing that does the physical actuation or motion. The plant then returns its current state back to the control system for it to determine another output, hopefully narrowing it down to the target value.</p>
+
+                <p>Let's get down some terminology. The <b>setpoint (SP)</b> is just a fancy name for the target value, and the <b>proccess variable (PV)</b> is an even fancier name for the current value. The difference between the setpoint and process variable is the <b>error (e)</b>. The goal of any control system is to reduce the error to as close to 0 as possible, which would mean \( PV = SP \). Because all these values may be constatly changing over time, it's usually written as a function of time instead of as a variable. You can drag the bars on the graph to see how it works.</p>
 
                 <p class="equation">\[ e(t) = SP(t) - PV(t) \]</p>
 
-                <p>Before delving into actual PID, let's take a look at a more naive control system as a example: <b>bang-bang (BB) control</b>. In BB control, when \(PV < SP\) (the error is positive), the controller output (CO) will be set to positive 1: forward, and when \(PV > SP\) (the error is negative), the controller output will be set to -1: reverse. This means that our controller only has two discreet states (technically 3, but an error of zero is unrealistic).</p>
+                <iframe src="https://www.desmos.com/calculator/o3mebeey9u?embed" width="500px" height="500px" frameborder=0></iframe>
+
+                <p>It's extremely important that you get the concept of the error. The error will be positive if \( PV < SP \) and negative if \( PV > SP \), and the larger the difference between the two, the farther from 0 the error will be.</p>
+
+                <p>Before delving into actual PID, let's take a look at a simpler but less effective control system as a example: <b>bang-bang (BB) control</b>, also known as on-off control. In BB control, when the error is positive, the controller output (CO) will be set to positive constant, and when the error is negative, the controller output will be set to a negative constant. This means that our controller only has two discreet states. (Technically 3, but an error of zero can be ignored in real applications). Think about it for a second: the output is basically pushing against the direction of the error to reduce it.</p>
 
                 <p class="equation">\[ CO(t) = \begin{cases} 
                     -C, & e(t)<0 \\ 
                     C, & e(t)>0 \\ 
                     0, & e(t)=0
-                \end{cases} \, \, \, \, \text{where C is a constant} \]</p>
+                \end{cases} \]</p>
 
-                <p>Let's take the example of a car, which will start 10 meters from a parking spot and will try to get as close as possible. Let's pretend that the controller can set the acceleration of the car instantaneously forward and backward up to 1 m/s<sup>2</sup>. This is a very simplistic model, but it should work for the purpose of this.</p>
+                <p>Let's use a car as our model, which will try to get to a certain position. Our car will be able to control its acceleration, but cannot directly control its speed or position. It's kind of like how we apply gas or the brakes to accelerate or decelerate an actual car. (Let's pretend that cruise control and self-driving cars don't exist.)</p>
 
-                <p>Let's take a look at BB Control in action! Pay attention to the error, acceleration, and velocity, and play around with the sliders:</p>
+                <p>Take a look at BB Control in action in this simulation! You can set the setpoint with the slider under the car, and then press play to watch the car go. The vectors above the car represent the direction and magnitude of the error and acceleration. Remember, the error is just the signed distance between the car and setpoint, and you should be able to see how it relates with the acceleration. Try playing around will the acceleration slider and see what happens!</p>
 
-                <figure id="BBCarSim1">
+                <figure id="BBSim1">
                     <div class="graphPanel">
-                        <div class="carSim">
-                            <img class="car" src="images/car.png" />
-                            <div class="setpointLine"></div>
-                        </div>
-                        <div class="errorBracket"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
+                        <label>Acceleration:</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed1">20.00</label>
-                        </div>
-                        <hr />
-                        <label>Acceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
-                            <label for="acc1">10.00</label>
+                            <input id="acc1" class="accInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="acc1"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -81,38 +85,27 @@
                     </div>
                 </figure>
 
-                <p>As you can see, it's not great. After all, it's not like you start braking right when you hit the crosswalk; a good control system needs some amount of prediction. Bang-bang control tends to osscilate indefinitely. You can decrease the max speed to minimize overshoot, but then it takes much longer.</p>
+                <p>As you can see, BB Control tends to be kind of a blunt hammer. With just 2 states, it tends to overshoot and then over-correct itself, oscillating out of control. Even changing the acceleration doesn't remedy the problem as it just doesn't seem to be able to settle on the setpoint whether it goes fast or slow. We need something that has more precision and can slow down as it approaches a setpoint. As a result, BB control is only used for things like thermostats, where efficiency and precision aren't too important.</p>
 
-                <p>Instead of this clunky animation, let's use a graph. The horizontal axis will show how much time has elapsed in seconds, vertical axis will show displacement. The blue dashed line shows the target setpoint, and the red line shows the proccess variable over time. An additional green line will show the error over time. The closer the error is to 0, the better.</p>
+                <p>While the animations are nice, graphs are a better way of visualising the motion of the car over. The red line will represent the PV, and the blue graph will represent the SP.</p>
 
-                <figure id="BBCarSim2">
+                <figure id="BBSim2">
                     <div class="graphPanel">
-                        <div class="carSim">
-                            <img class="car" src="images/car.png" />
-                            <div class="setpointLine"></div>
-                        </div>
-                        <div class="errorBracket"></div>
-                        <div class="graph"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
+                        <label>Acceleration:</label>
                         <div class="inputGroup">
-                            <input id="maxSpeed1" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed1">20.00</label>
-                        </div>
-                        <hr />
-                        <label>Acceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="acc1" class="accInput" type="range" min="0" max="20" step="0.01" value="10">
-                            <label for="acc1">10.00</label>
+                            <input id="acc2" class="accInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="acc2"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -122,54 +115,45 @@
                     </div>
                 </figure>
 
-                <p>Often, we will want to use control block diagrams to show the mechanics of a control system. In this diagram, the control system will take the setpoint and measured process variable from the sensor and calculate an error. If the error is positive, the controller will output a positive value to the process, in this case the car's wheel motors, and accelerate it forward. Vice versa for reverse. The sensor then measures the process variable and sends it back to the control system. With this feedback loop, the control system will attempt to adjust to get PV as close to SP as possible.</p>
+                <p>With a graph, the oscillatory motion becomes much clearer and easier to quantify. As we introduce PID, pay attention to the shape of the graph and how it changes as you adjust parameters.</p>
+
+                <p>Often, we will want to use control block diagrams to show the flow of a control system. In this diagram, the control system calculates the error, and figures out whether to output a positive or negative value. After sending this value to the plant, it will spit out its PV for the controller to calculate the error all over again. </p>
 
                 <img class="diagram" src="images/bbDiagram.svg" />
 
-                <p>As you can see, bang-bang control isn't great due to the constant oscillations. While this may be acceptable for an average waterheater or thermostat where swiftness and precision aren't the most important, more precise control systems such as PID would be better.</p>
+                <p>As we move on to more complicated control systems, make sure you understand how the control loop feeds into itself, continually attempting to drive the error to 0.</p>
             </section>
 
             <section>
-                <h3>P Controller: Getting There</h3>
+                <h3>________<br/> P Controller: Getting There</h3>
 
-                <p>Let's start with a P controller. The p stands for proportional, meaning the control input will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, but it's instead a negative output.</p>
+                <p>Now let's start with just a P controller and leave out the I and D. The P stands for proportional, meaning the control output will be <u>proportional</u> to the error. This means that if the error is very large, the controller output will likewise be large, and if the error is small, the output will be small. The same applies for a negative error, outputing a negative value instead. Theoretically, this should help limit the oscillation from BB control, as it wouldn't keep pushing full speed as the error approaches 0, right?</p>
 
-                <p>Let's put it in numerical terms. If we make the controller output equal to the error, this will achieve the desired results. However, we want to multiply the error by a constant to scale it if we want to make it faster or slower. This constant is called the <b>proportional gain</b>, symbolized by \(K_{p}\).</p>
+                <p>In mathematical terms, we could set the controller output structly equal to the error. However, we will probably want to multiply the error by some constant to scale it up or down, tuning it to just the right value. After all, a car's position would be much different from a pool's water level, so different constants would be needed. This constant that we multiply by is called the <b>proportional gain</b> or p-gain, notated with \(K_{p}\).</p>
 
-                <p>Here is ther first part of our equation. As you can see, the controllers output (\(CO(t)\)) is directly proportional to the error.</p>
+                <p>Now we have the first part of the equation for a P controller. As you can see, the controllers output (\(CO(t)\)) is directly proportional to the error.</p>
 
                 <p class="equation">\[ CO(t) = K_{p}e(t) \]</p>
 
-                <p>Try getting a feel for a P controller in this simulation, where we've added a bit of friction to have it represent reality just a bit more accurately. Notice how instead of having the acceleration be constant, it changes based on how close the error is to 0.</p>
+                <p>Try getting a feel for a P controller in this simulation, and look out for how the error relates to the acceleration. What happens when you increase and decrease the proportional gain?</p>
 
                 <figure id="PSim3">
                     <div class="graphPanel">
-                        <div class="graph"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="5" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
-                        <div class="inputGroup">
-                            <input id="maxSpeed3" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed3">20.00</label>
-                        </div>
-                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="maxFricDec3" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
-                            <label for="maxFricDec3">2.50</label>
-                        </div>
-                        <hr />
                         <label>P-Gain (K<sub>p</sub>):</label>
                         <div class="inputGroup">
-                            <input id="p3" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.10">
-                            <label for="p3">0.10</label>
+                            <input id="p3" class="pInput" type="range" min="0" max="3" step="0.01" value="1.5">
+                            <label for="p3"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -179,96 +163,128 @@
                     </div>
                 </figure>
 
-                <p>Yay, our control system, is no longer oscillating constantly, and it's a definite improvement over Bang-bang control. However, we now have another issue: the persistent error at the end. Towards the end of the graph, you can see that the error gets close to 0 but is stuck at some value. This is called the <b>steady-state error</b>. You can hover over the line on the graph to see its precise value.</p>
+                <p>Eh, not much better is it? P Control is slightly advantageous to BB-Control as it oscillates less frequently, making it preferrable where some stability is needed. (Fun fact: the oscillations will have the same frequency regardless of what starting error!) However, it never quite reaches the setpoint, which is a problem for us trying to minimize ther error as quickly and efficiently as possible.</p>
 
-                <p>But what causes steady-state error? Well, since our error is very close to 0, the controller will output a small value. In a perfect world, this would be no problem, but we have friction in our world. The output from the controller is just not enough to overcome friction and drive the error to 0. While this is definitely exxagerated in our simulation, this can be a problem in the real world where a degree of precision is needed.</p>
+                <p>Here is where we introduce <b>damping</b>, or a loss of energy over time. Almost any mechanical system will experience some sort of damping; in our example, it could be caused by air resistance or kinetic friction. These resistive forces are often out of our control, but we can still use it to our advantage, adjusting our p-gain to account for it.</p>
 
-                <p>Not all hope is lost though as our next section on PI Controllers has the solution!</p>
+                <p>We'll use a pretty simple model for damping, just multiplying the velocity by a constant. A damping of 0 means that the velocity will not be changed, whereas a damping of 1 means that the car will not move at all. Damping should be close to 0, but it's definitely not negligible. Technically, this is not how friction works, but it gets the point across. Other model may have different types of damping such as heat, where heat is constantly escaping out of the system.</p>
+                    
+                <p>We will also implement a minimum acceleration. This is a small threshold that the acceleration must cross over in order to start moving. This could caused by static friction, imperfections in the motors, or backlash somewhere. (Backlash is where components don't fit to gether exactly due to there needing to be a bit of wiggle room.) Like damping, it is often an uncontrollable factor and we have to tune our gains to overcome it.</p>
 
-                <p>First let's take a look at our trusty control block diagram. You should see that our controller just takes the error and multiplies it by the proportionality constant.</p>
+                <p>Let's look at an example! Adjust the minimum acceleration and damping sliders and see how the curve behaves. Remember, in the real world, we can only do so much to try to limit the resistive forces, and we have to tune our gains to overcome it.</p>
 
-                <img class="diagram" src="images/pDiagram.svg" />
+                <figure id="PSim4">
+                    <div class="graphPanel">
+                        <div class="errorBar">e</div>
+                        <div class="accBar">acc</div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
+                    </div>
 
-                <p>Now onto the next step!</p>          
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p4" class="pInput" type="range" min="0" max="5" step="0.01" value="1.5">
+                            <label for="p4"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp4" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="damp4"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc4" class="minAccInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="minAcc4"></label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
+
+                <p>Now we're getting somewhere! As you can see damping forces can actually be helpful for us to narrow down onto one value! However, if the damping and minimum acceleration are substantial, then we might run into another problem: really slow convergence onto the setpoint and possibly a <b>steady-state error</b>, a persistent non-zero error at the end.</p>
+
+                <p>Steady state error can be quite a nuisance where precision is needed. Since the error is very close to 0, the controller will output a very small value. In a perfect world, this would be no problem, but we have friction to get in the way in the real world. The small output from the P-controller is unable to overcome the resistive forces and we end up with slow convergence or even that steady-state error in the worst case.</p>
+
+                <p>However, not all hope is lost! The integral part of our PID controller is designed to help that.</p>
+
+                <p>Let's take a look at our current progress through a control diagram. You should be able to trace the feedback loop.</p>
+
+                <img class="diagram" src="images/pDiagram.svg" />         
             </section>
 
             <section>
-                <h3>PI Controller: A Little Push</h3>
+                <h3>________<br/> PI Controller: A Little Push</h3>
 
-                <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea if you don't know calculus, but I'll try to give a basic idea for what it is in a sort of mini calculus crash course. If you're interested, you should learn more about integrals, as this is just a short and sloppy run-down.</p>
+                <p>Now, the integral, which is what the I in PI stands for, is a pretty complex idea. If you are already familiar with calculus, feel free to skim or skip ahead. Otherwise, here's the gist.</p>
                 
                 <p>Put simply, the integral is the area under the graph of a function. Integrals are often notated with a weird S-shape:</p>
 
-                <p class="equation">\[ \int f(x) \, dx \]</p>
+                <p class="equation">\[ \int_a^b f(x) \, dx \]</p>
 
-                <p>This may seem weird, but it's quite simple. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. The little \(dx\) just represents that our integral is in terms of our intependent variable x, but that can be ignored.</p>
+                <p>The two little numbers are the bounds of our integral. It just means the area from x=a to x=b. You can just ignore the little \(dx\) for now. Let's say that the following graph represents the function \(f(x)\). The integral is just the area between the curve and the x-axis. </p>
 
                 <img src="images/integral.png" alt="Integral" />
 
-                <p>If the curve goes under the x-axis, then the integral will be negative under that portion of the graph.</p>
+                <p>Simple right? There's one caveat. If the curve goes under the x-axis, the integral on that interval will be negative. The total integral of an interval is the sum of the areas of its little segments.</p>
 
                 <img src="images/negIntegral.png" alt="Negative Integral" />
 
-                <p>Now this might seem like something too complicated to work out, but we can approximate the integral using something called a Riemann sum. If we filled the area with rectangles, we can find the approximate area of all the rectangles. As we increase the amount of rectangles, our approximation gets better and better.</p>
+                <p>You can also think of the integral as an accumulation of the function, a way to sum up all the values of a function over a certain range. For now, we're going to put off actually calculuating the integral to a later section and just assume that we can calculate it.</p>
+                
+                <p> If you're still a bit confused about the concept, I would recommend checking out 3Blue1Brown and their <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" target="_blank">Essence of Calculus</a> series. Chapter 8 talks specifically about integrals, but the entire series is great for getting an intuition for basic calculus.</p>
 
-                <img src="images/riemann1.png" alt="Riemann Sum Thick" />
-                <img src="images/riemann2.png" alt="Riemann Sum Medium" />
-                <img src="images/riemann3.png" alt="Riemann Sum Thin" />
+                <p>We are now ready for PI COntrol. For our updated PI control system, here is the equation:</p>
 
-                <p>If you're still unsure about integrals and Riemann Sums, here's a little embed from Desmos that you can play around with.</p>
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \, dT \]</p>
 
-                <p>We are now ready for PI COntrol.</p>
+                <p>Now slow down! As you can see, we've taken the P term from our P Controller and just added an integral term to the end. We also have a similar \(K_{i}\) constant, which we multiply with the integral in order to give it more or less weight. This is called the <b>integral gain</b></p>
 
-                <p>We want to find the integral of the error function. Given how the error is a recursive function, constantly adjusting to itself in real time, we can't really find the integral analytically.</p>
+                <p>Now you might be thinking, what is the integral supposed to do? Play around in the simulation and see if you can figure it out yourself before the explanation. Because the proportional and integral terms are separate, I've separated the components of acceleration from P and I. Try seeing if you can overcome the frictional forces only adjusting the integral term.</p>
 
-                <p>This is where Riemann sums come in. No control system can reasonably iterate at every single moment; there always has to be some sort of frame rate or small tick of time where the control system waits in between iterations. We can take advantage of this to approximate an integral.</p>
-
-                <p>Riemann pi image</p>
-
-                <p>We'll leave those computations out for now until the last chapter and pretend that we can just find the area under the curve.</p>
-
-                <p>For our updated PI control system, here is the equation:</p>
-
-                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int e(t) \, dt \]</p>
-
-                <p>As you can see, we've taken the P term from our P Controller and just added an integral to the end. We also have a similar \(K_{i}\), which we multiply with the integral in order to give it more or less weight. This is called the <b>i-gain</b></p>
-
-                <p>Now you might be thinking, how is the integral supposed to make it better? Before I answer, try fiddling around with it in a simulation. What does the integral do? What happens if you give it more or less weight?</p>
-
-                <figure id="PISim4">
+                <figure id="PISim5">
                     <div class="graphPanel">
-                        <div class="graph"></div>
-                        <p>Time: <span class="time">0.00</span> s</p>
-                        <p>SP: 10.00m</p>
-                        <p>PV: <span class="pv">0.00</span> m</p>
-                        <p>Error: <span class="error">10.00</span> m</p>
-                        <p>Integral: <span class="int">0.00</span></p>
-                        <p>Acceleration: <span class="acc">0.00</span> m/s<sup>2</sup></p>
-                        <p>Velocity: <span class="vel">0.00</span> m/s</p>
+                        <div class="errorBar">e</div>
+                        <div class="accPBar">acc<sub>p</sub></div>
+                        <div class="accIBar">acc<sub>i</sub></div>
+                        <div class="accBar">acc<sub>total</sub></div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
                     </div>
 
                     <div class="optPanel">
                         <h4>Controls</h4>
-                        <label>Max Speed (m/s):</label>
-                        <div class="inputGroup">
-                            <input id="maxSpeed4" class="maxSpeedInput" type="range" min="0" max="30" step="0.01" value="20">
-                            <label for="maxSpeed4">20.00</label>
-                        </div>
-                        <label>Max Frictional Decceleration (m/s<sup>2</sup>):</label>
-                        <div class="inputGroup">
-                            <input id="maxFricDec4" class="maxFricDecInput" type="range" min="0" max="5" step="0.01" value="2.5">
-                            <label for="maxFricDec4">2.50</label>
-                        </div>
-                        <hr />
                         <label>P-Gain (K<sub>p</sub>):</label>
                         <div class="inputGroup">
-                            <input id="p4" class="pInput" type="range" min="0" max="0.25" step="0.01" value="0.2">
-                            <label for="p4">0.20</label>
+                            <input id="p5" class="pInput" type="range" min="0" max="3" step="0.01" value="1.5">
+                            <label for="p5"></label>
                         </div>
                         <label>I-Gain (K<sub>i</sub>):</label>
                         <div class="inputGroup">
-                            <input id="i4" class="iInput" type="range" min="0" max="0.05" step="0.005" value="0.01">
-                            <label for="i4">0.01</label>
+                            <input id="i5" class="iInput" type="range" min="0" max="0.5" step="0.01" value="0.25">
+                            <label for="i5"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp5" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="damp5"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc5" class="minAccInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="minAcc5"></label>
                         </div>
                         <div>
                             <button class="optButton play"><img src="images/play.png" />Play</button>
@@ -278,19 +294,373 @@
                     </div>
                 </figure>
 
-                <p>Have an idea of what the I term does? Over time, it sums up all the errors over time. When the error is still very large, it will add a lot to the controller output, accelerating it. When the error gets closer to 0, it will still increase the integral, but just a lot less. When the error gets less than 0, the integral will begin decreasing. See in the simulation how the integral changes as the error changes.</p>
+                <p>Have an idea of what the I term does? Remember, the integral is like a sum of the values of a function. Over time, it sums up all the cumulative errors, and if the error is positive, these values will add up in the integral. The same thing will happen for negative errors but in the opposite direction.</p>
 
-                <p>Can you see how this could get rid of our pesky steady-state error? With PI Control, the steady state error will continue to increase the area under the curve even if the error stays the same. As a result, it will gruadually drive the acceleration to overcome the friction. In a sense, the integral term is way to keep pushing the controller to adjust its value.</p>
+                <p>Can you see how this could get rid of our pesky steady-state error? With PI Control, the steady state error will continue to increase the area under the curve even if the error stays the same. As a result, it will gruadually drive the acceleration to overcome friction. In a sense, the integral term is way to keep pushing the controller. By the time the error is actually close enough to 0, the integral stops changing, and the acceleration components should balance out.</p>
 
-                <p>It's a big balancing act, however. An i-gain too small could lead to the error being reduced too slowly, with a steady state error basically coming back. On the other hand, if the i-gain is too big, it could cause the PV to overshoot the SP and overshoot again when trying to adjust back, causing the system to oscillate back and forth out of control. It's crucial that you understand how the i-term works in order to find that sweet spot.</p>
+                <p>That's why for many systems, PI controllers are enough, from temperature control to fluid flow regulation. For its simplicity, PI controllers are the default for many industrial applications.</p>
 
-                <p>We can add another element to our control block diagram, which adds the i-term to our previous p-term.</p>
+                <p>Tuning it is a big balancing act, as you could probably tell. An i-gain too small could lead to the error being reduced too slowly, with a steady state error basically coming back. On the other hand, if the i-gain is too big, it could spiral out of control, overshooting so much as to start oscillating or even diverging. Even though it's exxagerated in this model, you can see how the i-gain causes the controller to wobble quite a bit, which is a problem with PI Controllers. Generally, some overshoot is good in a control system as it gets to the setpoint faster and allows the system to adjust, but sometimes, speed and minimizing overshoot are most important, and that's where the D term comes in.</p>
 
-                <p>PI control block diagram</p>
+                <p>But first, we can add another element to our control block diagram:</p>
 
-                <p>PI Controllers are very powerful, and in some cases enough. There are many systems that use a PI controller. But, if you want even greater precision and efficiency, look no further that the full PID Controller!</p>
+                <img class="diagram" src="images/piDiagram.svg" />
+            </section>
+
+            <section>
+                <h3>________<br/> PID Controller: Predicting the Future</h3>
+
+                <p>For those applications where a simple PI controller just won't cut it, here's where the Derivative "D" term decomes useful.</p>
+
+                <p>The derivative is another one of those calculus terms, but this one is a little simpler. Graphically, it's just the slope of the tangent line at a given point on a function, denoted by \( f'(x) \). You can think of it as how the dependent variable changes as the independent variable changes. Again, 3Blue1Brown's <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" target="_blank">Essence of Calculus</a> series highly recommended. </p>
+
+                <p>Here's a little Desmos interactive to get a feel for derivatives. The blue graph is the function we're taking the derivative of, and notice how the tangent slope changes as you drag around the little blue point. The red graph actually represents the derivative of the blue graph. When the red graph is positive, the slope of the blue graph is positive, and vice versa.</p>
+
+                <iframe src="https://www.desmos.com/calculator/uhagilszae?embed" width="500px" height="500px" frameborder=0></iframe>
+
+                <p>Like before, we will add an additional derivative term to our equation: our final equation for PID! Again, the derivative is multiplied by the <b>derivative gain</b>. Can you guess what the derivative will do?</p>
+
+                <p class="equation">\[ CO(t) = K_{p}e(t) + K_{i}\int_0^t e(T) \,dT + K_{d} e'(t) \]</p>
+
+                <p>If you read the section title, you can probably guess. The derivative term is there to rein the controller back, to tell the controller to slow down before it creashes into a lamppost or something. Still not sure? Try a simulation:</p>
+
+                <figure id="PIDSim6">
+                    <div class="graphPanel">
+                        <div class="errorBar">e</div>
+                        <div class="accPBar">acc<sub>p</sub></div>
+                        <div class="accIBar">acc<sub>i</sub></div>
+                        <div class="accDBar">acc<sub>d</sub></div>
+                        <div class="accBar">acc<sub>total</sub></div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p6" class="pInput" type="range" min="0" max="3" step="0.01" value="1.5">
+                            <label for="p6"></label>
+                        </div>
+                        <label>I-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="i6" class="iInput" type="range" min="0" max="0.5" step="0.01" value="0.3">
+                            <label for="i6"></label>
+                        </div>
+                        <label>D-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="d6" class="dInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="d6"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp6" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="damp6"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc6" class="minAccInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="minAcc6"></label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
+
+                <p>Taking a look at the vectors, you can see that the derivative action often works against the error, which seems at first counterintuitive, but balancing it with the P and I terms can achieve a nice effect. As the error is decreasing, meaning the derivative is negative, the derivative term itself will be negative, pushing against the motion of the car. The larger the speed, the harder the derivative term pushes. This effectively limits the speed from going too high, so the overshoot will not be as large as the error approaches 0. While there may be a longer response time with PID compared to PI, there is significantly more stability and a lot less oscillation. It's basically artificial damping!</p>
+
+                <p>The derivative term has a fatal flaw though: <b>noise</b>. With any mechical system, there will be some random uncontrollable variations in the data whether it be from shaking, external forces, or just imprecise measurements. Because the derivative term is based on how the error is changing, small alterations in the measurements could be amplified by the derivative term and increase instability.</p>
+
+                <p>To simulate noise, let's multiply the alter the PV randomly by a small amount.</p>
+
+                <figure id="PIDSim7">
+                    <div class="graphPanel">
+                        <div class="errorBar">e</div>
+                        <div class="accPBar">acc<sub>p</sub></div>
+                        <div class="accIBar">acc<sub>i</sub></div>
+                        <div class="accDBar">acc<sub>d</sub></div>
+                        <div class="accBar">acc<sub>total</sub></div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p7" class="pInput" type="range" min="0" max="3" step="0.01" value="1.5">
+                            <label for="p7"></label>
+                        </div>
+                        <label>I-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="i7" class="iInput" type="range" min="0" max="0.5" step="0.01" value="0.3">
+                            <label for="i7"></label>
+                        </div>
+                        <label>D-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="d7" class="dInput" type="range" min="0" max="1" step="0.01" value="0.5">
+                            <label for="d7"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp7" class="dampInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="damp7"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc7" class="minAccInput" type="range" min="0" max="0.1" step="0.01" value="0.05">
+                            <label for="minAcc7"></label>
+                        </div>
+                        <label>Random Noise:</label>
+                        <div class="inputGroup">
+                            <input id="noise7" class="noiseInput" type="range" min="0" max="0.02" step="0.001" value="0.01">
+                            <label for="noise7"></label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
+
+                <p>Try turning on and off the Derivative gain. You can see that the derivative component fluctuates wildly as the data trembles, creating lots of instability. In cases where the data may vary like that, it's probably better to just use a PI controller.</p>
+
+                <p>And that's our overview of PID! To recap, here's a little control block diagram:</p>
+
+                <img class="diagram" src="images/pidDiagram.svg" />
+
+                <p>But now that we've learned the theoretical bits, time to figure out how to actually implement what we've learned.</p>
+            </section>
+
+            <section>
+                <h3>________<br/> Implementing PID</h3>
+
+                <p>Knowing PID is one thing, but implementing it is just a little bit more. You know how we just assumed that we could calculate the integral and derivative terms earlier? Well, here's where that comes into play.</p>
+
+                <p>Let's start with the integral. How do we even begin to calculate it? Well integrals are calculated with something called a <u>Riemann Sum</u>. Take the range where you want to integrate, and split it up into discrete chunks with a width of \( dx \). Now over each of those chunks, draw a rectangle with a width of dx and a height of f(x). The sum of each of the areas of the rectangles (accounting for negativity) approximates the integral. As the interval is split into more pieces (and \( dx \) becomes smaller), this approximation gets better. In fact, this is the definition of an integral! In integral notation, the curvy sign represents a sum, adding up many heights on the function and multiplying them by width \( dx \) to get the area of each rectangle.</p>
+
+                <iframe src="https://www.desmos.com/calculator/jxpe0vyzpj?embed" width="500px" height="500px" frameborder=0></iframe>
+
+                <p>Now in a calculus class, we'd try to calculate the integral or solution analytically, but let's leave the differential equation solving to the people way smarter and more qualified than me. Instead, we'll take advantage of the small time slices. When PID is actually used, the feedback loop doesn't go infinitely fast, so each time the controller cycles, we can update the integral by just adding the another small slice of area. For our purposes, there are 3 ways to do this. We'll use the Left Riemann Sums since they're the easiest to program, but they're basically all equivalent given small enough time steps and easy to compute. Thanks to Wikipedia for these images:</p>
+
+                <table>
+                    <tr>
+                        <td>
+                            <img src="images/leftRiemann.png" alt="Left Riemann Sum" class="gallery" />
+                            <small>Left Riemann Sum</small>
+                        </td>
+                        <td>
+                            <img src="images/rightRiemann.png" alt="Right Riemann Sum" class="gallery" />
+                            <small>Right Riemann Sum</small>
+                        </td>
+                        <td>
+                            <img src="images/trapRiemann.png" alt="Trapezoidal Riemann Sum" class="gallery" />
+                            <small>Trapezoidal Riemann Sum</small>
+                        </td>
+                    </tr>
+                </table>
+
+                <p>For the derivative, it's the same idea. the \( f'(x) \) notation is actually shorthand for \( \frac{df(x)}{dx} \), or the change in the function over the change in x, which should be familiar as the formula for slope. At each time step of our feedcback loop, our derivative can be calculated as the change in \( e(t) \) (current error - last error) divided by the change in time, or the time step.</p>
+
+                <p>Let's get coding! I'll be using pseudocode, but you can probably apply the general idea to all programming languages.</p>
+
+                <p>First we just need to set up our variables and set up our update function that will be called in the feedback loop:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; return <i>something</i>
+                </code>
+
+                <p>Each time we update, we want to calculate an error based on the setpoint and process variable. The proccess variable would come from whatever plant you're using. That could be from the pressure guage on an air tank or a speedometer, anything to measure your current PV. The plant would then take whatever is returned from this function to process. As for dt, it's just the time between cycles. You could have it be set on a timer to run on a certain frequency or have it run as often as possible and measure with an internal clock.</p>
+
+                <p>First, let's implement P:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/><br/>
+
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv <br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; return pTerm
+                </code>
+
+                <p>Simple. We're just taking the error and multiplying it by our proportional gain. Next, I:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    integral = 0 <br />
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv<br/>
+                    &emsp; integral += error * dt<br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; iTerm = Ki * integral<br/>
+                    &emsp; return pTerm + iTerm<br/>
+                </code>
+
+                <p>The integral is something that is persistent throughout the PID process, so we should define it outside of the function. Each time, we add the area of a little rectangle to approximate the integral. Note that if you want to use Right or Trapezoidal Riemann Sums, you have to keep track of the last error as well, and use that to help calculate the area of the rectangles or trapezoids respectively. We will have to use the last error for the derivative anyway.</p>
+
+                <p>Speaking of which, the derivative:</p>
+
+                <code>
+                    Kp = 1.0 <br/>
+                    Ki = 0.3 <br/>
+                    Kd = 0.5 <br/>
+                    integral = 0 <br />
+                    lastError = 0 <br />
+                    <br/>
+                    update(sp, pv, dt) <br/>
+                    &emsp; error = sp - pv<br/>
+                    &emsp; integral += error * dt<br/>
+                    &emsp; derivative = (error - lastError) / dt<br/><br/>
+
+                    &emsp; pTerm = Kp * error<br/>
+                    &emsp; iTerm = Ki * integral<br/>
+                    &emsp; dTerm = Kd * derivative<br/>
+                    &emsp; return pTerm + iTerm + dTerm<br/>
+                </code>
+
+                <p>And that's it. Change in error over change in time. That's it for coding PID. Of course there's much more you can do such as a bias terms and feed-forward, and there may be specific tweaks in specific languages such as in object-oriented languages. I recommend doing some of your own research on PID and even take a look at some examples. It never hurts to take a look at the work others have done!</p>
+
+                <p>If you're interested in trying out some PID programming, check out <a href="https://janismac.github.io/ControlChallenges/">JanisMac's Control Challenges</a>. See if you can implement PID and even try tuning it!</p>
+            </section>
+
+            <section style="padding-bottom: 0">
+                <h3>________<br/> Tuning PID</h3>
+
+                <p>Now we come to the crux of PID: tuning. Even if you have the most advanced control system in the world, it will amount to nothing if you don't tune it to its specific condition. For PID, you have to tune the three gains, adjusting them to suit whatever need your system requires.</p>
+
+                <p>Because the constants of PID are not connected to any physical properties, they must be determined experimentally rather than analytically, and these values often vary wildly with different systems. There are many algorithms that take experimental data to tune optimal gains such as the Ziegler–Nichols method as well as many softwares that can automatically find the optimal PID parameters. You can find more about these online. For this, we'll just go with manual tuning. Note that this doesn't mean everything is done by hand, just the determination of the gains; almost all applications of PID are electronic, and it's very useful to use softwhere that can graph data for you to look at.</p>
+
+                <p>I've made a little Java program to help graph and PID. Check it out <a href="https://github.com/alansheu2004/PID-Tuner">here</a> if you're interested!</p>
+
+                <p>Also, remember that different systems will have different needs to meet and may require different tuning methods. This will just be a very general guide (that I totally did not steal from Wikipedia), but always use application-specific knowledge and past experience as guides.</p>
+
+                <ol>
+                    <li>Set all the gains to 0 as a baseline. The plant should have no response.</li>
+                    <li>Slowly increase the p-gain until the PV begins to oscillate around the setpoint in a wave. Note that you're not dynamically changing the gains as they run, just adjusting the gains in between trials.</li>
+                    <li>Approximately cut the p-gain in half. This should lead to a decay in the amplitude.</li>
+                    <li>Now slowly increase the i-gain to overcome any steady-state error or damping. The error should hopefully converge onto 0. Be careful, as too much i-gain can lead to oscillation or divergence.</li>
+                    <li>If needed, slowly increase the d-gain until satisfaction. Note that while this should decrease the overshoot and make it less wobbly, it could increase the response time if too high. It all depends on what you value: precision or speed.</li>
+                    <li>Adjust your gains or do it all over again until its as perfect as you need!</li>
+                </ol>
+
+                <p>This series of images (from Wikipedia, of course), could be helpful in your tuning:</p>
+
+                <img src="images/pidTuning.gif" alt="PID Tuning Demo" /><br />
+
+                <table>
+                    <tr>
+                        <td>
+                            <img src="images/varyP.jpg" alt="Varying Kp" class="gallery" />
+                            <small>Varying K<sub>p</sub>, keeping K<sub>i</sub> & K<sub>d</sub> constant</small>
+                        </td>
+                        <td>
+                            <img src="images/varyI.png" alt="Varying Ki" class="gallery" />
+                            <small>Varying K<sub>i</sub>, keeping K<sub>p</sub> & K<sub>d</sub> constant</small>
+                        </td>
+                        <td>
+                            <img src="images/varyD.png" alt="Varying Kd" class="gallery" />
+                            <small>Varying K<sub>d</sub>, keeping K<sub>p</sub> & K<sub>i</sub> constant</small>
+                        </td>
+                    </tr>
+                </table>
+
+                <p>And remember, if there is a better way to tune for your specific application, go for that! Sometimes there are defaults that you can set the gains to and then adjust from there.</p>
+
+                <p>This article is just a basic overview of the process of PID, but I hope it sparked some interest, if not at least educated you a bit. There are always more levels to go down, more things you can do with PID and even controls systems far beyond with crazy linear algebra. I encourage you to go ahead and explore for yourself if you're interested!</p>
+
+                <p>Finally, here's one last simulation with everything I can think of:</p>
+
+                <figure id="PIDSim8">
+                    <div class="graphPanel">
+                        <div class="errorBar">e</div>
+                        <div class="accPBar">acc<sub>p</sub></div>
+                        <div class="accIBar">acc<sub>i</sub></div>
+                        <div class="accDBar">acc<sub>d</sub></div>
+                        <div class="accBar">acc<sub>total</sub></div>
+                        <img class="car" src="images/car.png" />
+                        <input type="range" class="spSlider" min="0" max="1" step="0.01" value="0.7" />
+                        <canvas class="graph" height="1000" width="1000">
+                            Your browser does not have support for HTML5 Canvas. Consider switching to a different browser or updating.
+                        </canvas>
+                    </div>
+
+                    <div class="optPanel">
+                        <h4>Controls</h4>
+                        <label>P-Gain (K<sub>p</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="p8" class="pInput" type="range" min="0" max="3" step="0.01" value="0">
+                            <label for="p8"></label>
+                        </div>
+                        <label>I-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="i8" class="iInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="i8"></label>
+                        </div>
+                        <label>D-Gain (K<sub>i</sub>):</label>
+                        <div class="inputGroup">
+                            <input id="d8" class="dInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="d8"></label>
+                        </div>
+                        <hr />
+                        <label>Damping (0-1):</label>
+                        <div class="inputGroup">
+                            <input id="damp8" class="dampInput" type="range" min="0" max="1" step="0.01" value="0">
+                            <label for="damp8"></label>
+                        </div>
+                        <label>Min. Acceleration:</label>
+                        <div class="inputGroup">
+                            <input id="minAcc8" class="minAccInput" type="range" min="0" max="0.1" step="0.001" value="0">
+                            <label for="minAcc8"></label>
+                        </div>
+                        <label>Random Noise:</label>
+                        <div class="inputGroup">
+                            <input id="noise8" class="noiseInput" type="range" min="0" max="0.05" step="0.001" value="0">
+                            <label for="noise8"></label>
+                        </div>
+                        <div>
+                            <button class="optButton play"><img src="images/play.png" />Play</button>
+                            <button class="optButton pause"><img src="images/pause.png" />Pause</button>
+                            <button class="optButton reset"><img src="images/reset.png" />Reset</button>
+                        </div>
+                    </div>
+                </figure>
+
+                <div id="footerTransition"></div>
             </section>
         </article>
+
+        <footer>
+            <div id="coolButtons">
+                <a href="https://github.com/alansheu2004"><img src="images/github.png" /></a>
+            </div>
+            <p>Phone: 1 (408)-218-0411</p>
+            <p>Email: <a href="mailto:alansheu2004@gmail.com">alansheu2004@gmail.com</a></p>
+            <p>Check out some other projects at <a href="https://alansheu2004.github.io">alansheu2004.github.io</a></p>
+        </footer>
     </body>
 
     <script src="sliders.js"></script>

@@ -1,0 +1,105 @@
+figure {
+    background-color: #dddddd;
+    width: 70%;
+    margin: 3vh auto;
+    display: flex;
+    flex-direction: row;
+}
+
+div.graphPanel {
+    flex: 3 1 0;
+    padding: 2vw 10vw;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+div[class$="Bar"] {
+    position: relative;
+    border-bottom: 2px solid black;
+    width: 2px;
+    left: 50%;
+}
+
+img.car {
+    height: 50px;
+    position: relative;
+}
+
+input.spSlider {
+    display: block;
+    width: 100%;
+}
+
+canvas.graph {
+    width: 100%;
+    border: 1px solid gray;
+    border-top: none;
+}
+
+div.optPanel {
+    background-color: var(--background);
+    flex: 2 1 0;
+    padding: 2vw;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div.optPanel h4 {
+    font-size: 18pt;
+    text-align: center;
+    margin-bottom: 1vh;
+}
+
+div.optPanel label {
+    display: block;
+    font-size: 12pt;
+    text-align: left;
+    margin-bottom: 0.5vh;
+}
+
+div.inputGroup {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1vh;
+}
+
+div.inputGroup input[type="range"] {
+    flex: 1 1 0;
+}
+
+div.inputGroup label {
+    flex: 0 0 2.5em;
+    font-size: 12pt;
+    text-align: right;
+}
+
+div.optPanel hr {
+    border: none;
+    border-top: 1px solid black;
+    margin: 2vh 0;
+}
+
+button.optButton {
+    position: relative;
+    padding: 1vh 1vw;
+    font-size: 18pt;
+    background-color: var(--dark-background);
+    border: 1px solid white;
+    margin: 1vh auto;
+    font-family: Montserrat;
+    color: white;
+    vertical-align: middle;
+    display: none;
+}
+
+button.optButton img {
+    height: 18pt;
+    margin-right: 0.5vw;
+    filter: invert();
+}
+
+button.optButton.visible {
+    display: initial;
+}
