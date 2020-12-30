@@ -151,10 +151,11 @@ function Sim(figureId, getAcc, adjustAcc, adjustVel, adjustPV) {
         this.lastError = null;
         this.acc = getAcc(this);
 
+
         this.integral = 0;
         this.derivative = 0;
 
-        this.draw();
+        this.update();
     }
 
     this.playButton.addEventListener("click", function() {thisSim.play();});
