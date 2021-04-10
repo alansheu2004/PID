@@ -76,11 +76,11 @@ h1 {
     text-align: center;
     font-size: 48pt;
     background-color: var(--dark-background);
-    padding: 10vh 0 2vh;
+    padding: 5vh 0 2vh;
 }
 
 h1 #titleImage {
-    height: 30vh;
+    height: 20vh;
     margin-bottom: 2vh;
 }
 
