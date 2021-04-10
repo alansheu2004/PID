@@ -453,26 +453,13 @@
 
                 <iframe src="https://www.desmos.com/calculator/jxpe0vyzpj?embed" width="500px" height="500px" frameborder=0></iframe>
 
-                <p>Now in a calculus class, we'd try to calculate the integral or solution analytically, but let's leave the differential equation solving to the people way smarter and more qualified than me. Instead, we'll take advantage of the small time slices. When PID is actually used, the feedback loop doesn't go infinitely fast, so each time the controller cycles, we can update the integral by just adding the another small slice of area. For our purposes, there are 3 ways to do this. We'll use the Left Riemann Sums since they're the easiest to program, but they're basically all equivalent given small enough time steps and easy to compute. Thanks to Wikipedia for these images:</p>
+                <p>In our program, we'll take advantage of the small time slices. When PID is actually used, the feedback loop doesn't go infinitely fast, so each time the controller cycles, we can update the integral by just adding the another small slice of area. For our purposes, there are 3 ways to do this. We'll use the Left Riemann Sums since they're the easiest to program, but all three mathods approximate the integral given sufficiently small timesteps:</p>
 
-                <table>
-                    <tr>
-                        <td>
-                            <img src="images/leftRiemann.png" alt="Left Riemann Sum" class="gallery" />
-                            <small>Left Riemann Sum</small>
-                        </td>
-                        <td>
-                            <img src="images/rightRiemann.png" alt="Right Riemann Sum" class="gallery" />
-                            <small>Right Riemann Sum</small>
-                        </td>
-                        <td>
-                            <img src="images/trapRiemann.png" alt="Trapezoidal Riemann Sum" class="gallery" />
-                            <small>Trapezoidal Riemann Sum</small>
-                        </td>
-                    </tr>
-                </table>
+                <img class="diagram" src="images/riemanns.svg" />
 
-                <p>For the derivative, it's the same idea. the \( f'(x) \) notation is actually shorthand for \( \frac{df(x)}{dx} \), or the change in the function over the change in x, which should be familiar as the formula for slope. At each time step of our feedcback loop, our derivative can be calculated as the change in \( e(t) \) (current error - last error) divided by the change in time, or the time step.</p>
+                <p>For the derivative, it's the same idea. the \( f'(x) \) notation is actually shorthand for \( \frac{df(x)}{dx} \), or the change in the function over the change in x, which should be familiar as the formula for slope. At each time step of our feedcback loop, our derivative can be calculated as the change in \( e(t) \) (current error - last error) divided by the change in time, or the time step. This is effectively taking the slope of the error between each iteration. You can see that this blue slope approximates the green true derivative as you drag timestep smaller:</p>
+
+                <iframe src="https://www.desmos.com/calculator/8omsjntbri?embed" width="500px" height="500px" style="border: 1px solid #ccc" frameborder=0></iframe>
 
                 <p>Let's get coding! I'll be using pseudocode, but you can probably apply the general idea to all programming languages.</p>
 
@@ -567,7 +554,7 @@
                     <li>Adjust your gains or do it all over again until its as perfect as you need!</li>
                 </ol>
 
-                <p>This series of images (from Wikipedia, of course), could be helpful in your tuning:</p>
+                <p>These animations illustrate how tuning different values might change the shape of the curve:</p>
 
                 <img src="images/pidTuning.gif" alt="PID Tuning Demo" /><br />
 
